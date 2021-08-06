@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Владимир Дьяченко](https://up.htmlacademy.ru/ecmascript/15/user/1520013).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Гуляев](https://htmlacademy.ru/profile/dima).
 
 ---
 
