@@ -8,7 +8,6 @@ import { getFilmCardTemplate } from './view/films/film-card.js';
 import { getShowMoreButtonTemplate } from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
-import { getCommentTemplate } from './view/films/comment.js';
 import { generateFilm } from './mock/film-card.js';
 import { getRandomPositiveInteger } from './utils/utils.js';
 
@@ -61,23 +60,14 @@ const footerElement = document.querySelector('.footer');
 
 const renderStatsPage = () => {
   render(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
-  render(mainElement, getSiteMenuTemplate(), InsertPosition.AFTER_BEGIN);
   render(mainElement, getSiteMenuTemplate(filterData), InsertPosition.AFTER_BEGIN);
   render(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
-  render(footerElement, getFooterStatisticsTemplate(), InsertPosition.BEFORE_END);
   render(footerElement, getFooterStatisticsTemplate(getRandomPositiveInteger(100000, 1500000)), InsertPosition.BEFORE_END);
 };
 
-const renderFilmModal = () => {
+const renderFilmModal = (filmData) => {
   //Details modal
-  render(document.body, getFilmModalTemplate(), InsertPosition.BEFORE_END);
-  const commentsListElement = document.querySelector('.film-details__comments-list');
-
-  //Comments
-  render(commentsListElement, getCommentTemplate(), InsertPosition.AFTER_BEGIN);
-  render(commentsListElement, getCommentTemplate(), InsertPosition.AFTER_BEGIN);
-  render(commentsListElement, getCommentTemplate(), InsertPosition.AFTER_BEGIN);
-  render(commentsListElement, getCommentTemplate(), InsertPosition.AFTER_BEGIN);
+  render(document.body, getFilmModalTemplate(filmData), InsertPosition.BEFORE_END);
 };
 
 const renderMainPage = () => {
@@ -98,7 +88,6 @@ const renderMainPage = () => {
   render(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
 
   //Site nav
-  render(mainElement, getSiteMenuTemplate(), InsertPosition.AFTER_BEGIN);
   render(mainElement, getSiteMenuTemplate(filterData), InsertPosition.AFTER_BEGIN);
 
   //Sort list
@@ -126,10 +115,9 @@ const renderMainPage = () => {
   mainElement.appendChild(filmsContainerElement);
 
   //Footer statistics
-  render(footerElement, getFooterStatisticsTemplate(), InsertPosition.BEFORE_END);
   render(footerElement, getFooterStatisticsTemplate(getRandomPositiveInteger(100000, 1500000)), InsertPosition.BEFORE_END);
 
-  renderFilmModal();
+  renderFilmModal(films[0]);
 };
 
 const setPage = (isStatPage = false) => isStatPage ? renderStatsPage() : renderMainPage();
