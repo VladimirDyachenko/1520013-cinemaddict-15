@@ -9,6 +9,7 @@ import { getShowMoreButtonTemplate } from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
 import { getCommentTemplate } from './view/films/comment.js';
+import { generateFilm } from './mock/film-card.js';
 
 const InsertPosition = {
   AFTER_BEGIN: 'afterbegin',
@@ -85,3 +86,7 @@ const renderMainPage = () => {
 const setPage = (isStatPage = false) => isStatPage ? renderStatsPage() : renderMainPage();
 
 setPage();
+
+const getFilmsMock = (amount = 20) =>  new Array(amount).fill().map(() => generateFilm());
+
+getFilmsMock();
