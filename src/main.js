@@ -10,6 +10,7 @@ import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
 import { getCommentTemplate } from './view/films/comment.js';
 import { generateFilm } from './mock/film-card.js';
+import { getRandomPositiveInteger } from './utils/utils.js';
 
 const InsertPosition = {
   AFTER_BEGIN: 'afterbegin',
@@ -22,6 +23,34 @@ const getFilmsMock = (amount = 20) =>  new Array(amount).fill().map(() => genera
 
 const films = getFilmsMock();
 
+const getFilterData = (filmList) => {
+  const watchList = [];
+  const historyList = [];
+  const favoriteList = [];
+
+  filmList.forEach((film) => {
+    if (film.watchlist) {
+      watchList.push(film);
+    }
+
+    if (film.alreadyWatched) {
+      historyList.push(film);
+    }
+
+    if (film.favorite) {
+      favoriteList.push(film);
+    }
+  });
+
+  return {
+    watchList,
+    historyList,
+    favoriteList,
+  };
+};
+
+const filterData = getFilterData(films);
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -33,8 +62,10 @@ const footerElement = document.querySelector('.footer');
 const renderStatsPage = () => {
   render(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
   render(mainElement, getSiteMenuTemplate(), InsertPosition.AFTER_BEGIN);
+  render(mainElement, getSiteMenuTemplate(filterData), InsertPosition.AFTER_BEGIN);
   render(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
   render(footerElement, getFooterStatisticsTemplate(), InsertPosition.BEFORE_END);
+  render(footerElement, getFooterStatisticsTemplate(getRandomPositiveInteger(100000, 1500000)), InsertPosition.BEFORE_END);
 };
 
 const renderFilmModal = () => {
@@ -68,6 +99,7 @@ const renderMainPage = () => {
 
   //Site nav
   render(mainElement, getSiteMenuTemplate(), InsertPosition.AFTER_BEGIN);
+  render(mainElement, getSiteMenuTemplate(filterData), InsertPosition.AFTER_BEGIN);
 
   //Sort list
   render(mainElement, getSortTemplate(), InsertPosition.BEFORE_END);
@@ -95,6 +127,7 @@ const renderMainPage = () => {
 
   //Footer statistics
   render(footerElement, getFooterStatisticsTemplate(), InsertPosition.BEFORE_END);
+  render(footerElement, getFooterStatisticsTemplate(getRandomPositiveInteger(100000, 1500000)), InsertPosition.BEFORE_END);
 
   renderFilmModal();
 };
