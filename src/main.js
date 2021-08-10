@@ -81,6 +81,8 @@ const renderMainPage = () => {
         render(containerElement, getFilmCardTemplate(films[lastIndex]), InsertPosition.BEFORE_END);
       }
       limit = lastIndex + 5 < films.length ? lastIndex + 5 : films.length;
+
+      return films.length - lastIndex;
     };
   };
 
@@ -107,6 +109,18 @@ const renderMainPage = () => {
 
   const filmsListElement = filmsContainerElement.querySelector('.films-list');
   render(filmsListElement, getShowMoreButtonTemplate(), InsertPosition.BEFORE_END);
+
+  const showMoreClickHandler = (event) => {
+    const filmsLeft = addFiveFilms();
+
+    if (filmsLeft === 0) {
+      event.target.removeEventListener('click', showMoreClickHandler);
+      event.target.style.display = 'none';
+    }
+  };
+
+  const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
+  showMoreButton.addEventListener('click', showMoreClickHandler);
 
   //Extra lists
   render(filmsContainerElement, getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
