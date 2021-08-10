@@ -41,3 +41,10 @@ export const getRandomDate = (daySpread = -7, monthSpread = -12, yearSpread = -1
 
   return dayjs().add(dayGap, 'day').add(monthGap, 'month').add(yearGap, 'year').toString();
 };
+
+export const getRuntimeString = (runtimeInMinutes) => {
+  const hours = Math.floor(runtimeInMinutes / 60);
+  const minutes = runtimeInMinutes % 60;
+
+  return hours > 0 ?`${hours}h ${minutes}m` : `${minutes}m`;
+};

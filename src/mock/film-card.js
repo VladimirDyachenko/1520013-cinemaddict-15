@@ -83,7 +83,7 @@ const getDescription = () => {
 };
 
 export const generateFilm = () => {
-  const [titile, poster] = getTitleAndPoster();
+  const [title, poster] = getTitleAndPoster();
   const comments = new Array(getRandomPositiveInteger(0, 5)).fill().map(() => generateComment());
   const alreadyWatched = Boolean(getRandomPositiveInteger(0, 1));
   let watchingDate = null;
@@ -91,8 +91,8 @@ export const generateFilm = () => {
   alreadyWatched ? watchingDate = getRandomDate(-7, -12, -2) : null;
 
   return {
-    titile,
-    alternativeTitle: `${titile} alternative title`,
+    title: title,
+    alternativeTitle: `${title} alternative title`,
     totalRating: getRandomPositiveFloat(0, 10, 1),
     poster,
     ageRating: getRandomArrayElement(ageRatings),

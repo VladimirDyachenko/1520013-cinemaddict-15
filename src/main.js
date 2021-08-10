@@ -18,6 +18,10 @@ const InsertPosition = {
   BEFORE_END: 'beforeend',
 };
 
+const getFilmsMock = (amount = 20) =>  new Array(amount).fill().map(() => generateFilm());
+
+const films = getFilmsMock();
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -46,6 +50,19 @@ const renderFilmModal = () => {
 };
 
 const renderMainPage = () => {
+
+  const makeRenderFilmsFunction = (containerElement) => {
+    let lastIndex = 0;
+    let limit = 5;
+
+    return () => {
+      for (lastIndex; lastIndex < limit; lastIndex++) {
+        render(containerElement, getFilmCardTemplate(films[lastIndex]), InsertPosition.BEFORE_END);
+      }
+      limit = lastIndex + 5 < films.length ? lastIndex + 5 : films.length;
+    };
+  };
+
   //User profile
   render(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
 
@@ -62,11 +79,10 @@ const renderMainPage = () => {
   const filmsContainerElement = filmsList.querySelector('.films');
 
   const filmsListContainerElement = filmsContainerElement.querySelector('.films-list__container');
-  render(filmsListContainerElement, getFilmCardTemplate(), InsertPosition.AFTER_BEGIN);
-  render(filmsListContainerElement, getFilmCardTemplate(), InsertPosition.AFTER_BEGIN);
-  render(filmsListContainerElement, getFilmCardTemplate(), InsertPosition.AFTER_BEGIN);
-  render(filmsListContainerElement, getFilmCardTemplate(), InsertPosition.AFTER_BEGIN);
-  render(filmsListContainerElement, getFilmCardTemplate(), InsertPosition.AFTER_BEGIN);
+
+  const addFiveFilms = makeRenderFilmsFunction(filmsListContainerElement);
+
+  addFiveFilms();
 
   const filmsListElement = filmsContainerElement.querySelector('.films-list');
   render(filmsListElement, getShowMoreButtonTemplate(), InsertPosition.BEFORE_END);
@@ -86,7 +102,3 @@ const renderMainPage = () => {
 const setPage = (isStatPage = false) => isStatPage ? renderStatsPage() : renderMainPage();
 
 setPage();
-
-const getFilmsMock = (amount = 20) =>  new Array(amount).fill().map(() => generateFilm());
-
-getFilmsMock();
