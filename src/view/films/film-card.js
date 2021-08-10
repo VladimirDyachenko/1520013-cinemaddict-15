@@ -1,5 +1,5 @@
-import dayjs from "dayjs";
-import { getRuntimeString } from "../../utils/utils.js";
+import dayjs from 'dayjs';
+import { getRuntimeString } from '../../utils/utils.js';
 
 export const getFilmCardTemplate = (film) => {
   const {
@@ -13,7 +13,7 @@ export const getFilmCardTemplate = (film) => {
     comments,
     watchlist,
     alreadyWatched,
-    favorite
+    favorite,
   } = film;
   const year = dayjs(release.date).get('year').toString();
   const duration = getRuntimeString(runtime);
@@ -41,5 +41,5 @@ export const getFilmCardTemplate = (film) => {
         <button class="film-card__controls-item film-card__controls-item--favorite ${favorite ? controlActiveClass : ''}" type="button">Mark as favorite</button>
       </div>
     </article>
-  `
+  `;
 };
