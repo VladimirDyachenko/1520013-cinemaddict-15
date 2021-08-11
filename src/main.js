@@ -8,7 +8,7 @@ import { getFilmCardTemplate } from './view/films/film-card.js';
 import ShowMoreButtonView from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
-import { generateFilm } from './mock/film-card.js';
+import { getTestData } from './mock/films.js';
 import {
   getRandomPositiveInteger,
   InsertPosition,
@@ -16,37 +16,8 @@ import {
   renderElement
 } from './utils/utils.js';
 
-const getFilmsMock = (amount = 20) =>  new Array(amount).fill().map(() => generateFilm());
+const [films, filterData] = getTestData();
 
-const films = getFilmsMock();
-
-const getFilterData = (filmList) => {
-  const watchList = [];
-  const historyList = [];
-  const favoriteList = [];
-
-  filmList.forEach((film) => {
-    if (film.watchlist) {
-      watchList.push(film);
-    }
-
-    if (film.alreadyWatched) {
-      historyList.push(film);
-    }
-
-    if (film.favorite) {
-      favoriteList.push(film);
-    }
-  });
-
-  return {
-    watchList,
-    historyList,
-    favoriteList,
-  };
-};
-
-const filterData = getFilterData(films);
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');

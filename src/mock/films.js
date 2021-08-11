@@ -5,7 +5,7 @@ import {
   getRandomArrayElement,
   getRandomArray,
   getRandomDate
-} from './../utils/utils.js';
+} from '../utils/utils.js';
 
 const TitlePosterPairs = {
   'Made for each other': 'made-for-each-other.png',
@@ -81,7 +81,7 @@ const getDescription = () => {
   return temp.join(' ');
 };
 
-export const generateFilm = () => {
+const generateFilm = () => {
   const [title, poster] = getTitleAndPoster();
   const comments = new Array(getRandomPositiveInteger(0, 5)).fill().map(() => generateComment());
   const alreadyWatched = Boolean(getRandomPositiveInteger(0, 1));
@@ -111,4 +111,37 @@ export const generateFilm = () => {
     favorite: Boolean(getRandomPositiveInteger(0, 1)),
     comments,
   };
+};
+
+const getFilterData = (filmList) => {
+  const watchList = [];
+  const historyList = [];
+  const favoriteList = [];
+
+  filmList.forEach((film) => {
+    if (film.watchlist) {
+      watchList.push(film);
+    }
+
+    if (film.alreadyWatched) {
+      historyList.push(film);
+    }
+
+    if (film.favorite) {
+      favoriteList.push(film);
+    }
+  });
+
+  return {
+    watchList,
+    historyList,
+    favoriteList,
+  };
+};
+
+export const getTestData = (amount = 20) => {
+  const films = new Array(amount).fill().map(() => generateFilm());
+  const filterData = getFilterData(films);
+
+  return [films, filterData];
 };
