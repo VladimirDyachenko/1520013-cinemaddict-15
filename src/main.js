@@ -24,7 +24,7 @@ const footerElement = document.querySelector('.footer');
 
 const renderStatsPage = () => {
   renderElement(headerElement, new UserProfileView(filterData.watchList.length).getElement(), InsertPosition.BEFORE_END);
-  renderTemplate(mainElement, new SiteMenuView(filterData).getTemplate(), InsertPosition.AFTER_BEGIN);
+  renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
   renderTemplate(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
   renderElement(footerElement, new FooterStatisticView(getRandomPositiveInteger(100000, 1500000)).getElement(), InsertPosition.BEFORE_END);
 };
