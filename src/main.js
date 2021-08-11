@@ -2,7 +2,7 @@ import SiteMenuView from './view/site-menu.js';
 import FooterStatisticView from './view/footer-statistic.js';
 import { getStatisticsTemplate } from './view/statistic/statistic.js';
 import UserProfileView from './view/user-profile.js';
-import { getFilmsListTemplate } from './view/films/films-list.js';
+import FilmListView from './view/films/films-list.js';
 import SortListView from './view/films/sort.js';
 import { getFilmCardTemplate } from './view/films/film-card.js';
 import ShowMoreButtonView from './view/films/show-more-button.js';
@@ -16,17 +16,21 @@ import {
   renderElement
 } from './utils/utils.js';
 
+const FILMS_PER_ROW = 5;
+
 const [films, filterData] = getTestData();
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 
+const filmsCount = getRandomPositiveInteger(100000, 1500000);
+
 const renderStatsPage = () => {
   renderElement(headerElement, new UserProfileView(filterData.watchList.length).getElement(), InsertPosition.BEFORE_END);
   renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
   renderTemplate(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
-  renderElement(footerElement, new FooterStatisticView(getRandomPositiveInteger(100000, 1500000)).getElement(), InsertPosition.BEFORE_END);
+  renderElement(footerElement, new FooterStatisticView(filmsCount).getElement(), InsertPosition.BEFORE_END);
 };
 
 const renderFilmModal = (filmData) => {
@@ -38,13 +42,13 @@ const renderMainPage = () => {
 
   const makeRenderFilmsFunction = (containerElement) => {
     let lastIndex = 0;
-    let limit = 5;
+    let limit = FILMS_PER_ROW;
 
     return () => {
       for (lastIndex; lastIndex < limit; lastIndex++) {
         renderTemplate(containerElement, getFilmCardTemplate(films[lastIndex]), InsertPosition.BEFORE_END);
       }
-      limit = lastIndex + 5 < films.length ? lastIndex + 5 : films.length;
+      limit = lastIndex + FILMS_PER_ROW < films.length ? lastIndex + FILMS_PER_ROW : films.length;
 
       return films.length - lastIndex;
     };
@@ -60,41 +64,35 @@ const renderMainPage = () => {
   renderElement(mainElement, new SortListView().getElement(), InsertPosition.BEFORE_END);
 
   //Films container
-  const filmsList = document.createElement('div');
-  renderTemplate(filmsList, getFilmsListTemplate(), InsertPosition.AFTER_BEGIN);
+  const filmsList = new FilmListView();
+  renderElement(mainElement, filmsList.getElement(), InsertPosition.BEFORE_END);
 
-  const filmsContainerElement = filmsList.querySelector('.films');
-
-  const filmsListContainerElement = filmsContainerElement.querySelector('.films-list__container');
-
-  const addFiveFilms = makeRenderFilmsFunction(filmsListContainerElement);
+  const addFiveFilms = makeRenderFilmsFunction(filmsList.getFilmContainer());
 
   addFiveFilms();
 
-  const filmsListElement = filmsContainerElement.querySelector('.films-list');
-
   const showMoreButton = new ShowMoreButtonView().getElement();
-  renderElement(filmsListElement, showMoreButton, InsertPosition.BEFORE_END);
+  renderElement(filmsList.getFilmSection(), showMoreButton, InsertPosition.BEFORE_END);
 
   const showMoreClickHandler = (event) => {
     const filmsLeft = addFiveFilms();
 
     if (filmsLeft === 0) {
       event.target.removeEventListener('click', showMoreClickHandler);
-      event.target.style.display = 'none';
+      event.target.remove();
     }
   };
 
   showMoreButton.addEventListener('click', showMoreClickHandler);
 
-  //Extra lists
-  renderTemplate(filmsContainerElement, getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
-  renderTemplate(filmsContainerElement, getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
+  // Extra lists
+  renderTemplate(filmsList.getElement(), getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
+  renderTemplate(filmsList.getElement(), getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
 
-  mainElement.appendChild(filmsContainerElement);
+  mainElement.appendChild(filmsList.getElement());
 
   //Footer statistics
-  renderElement(footerElement, new FooterStatisticView(getRandomPositiveInteger(100000, 1500000)).getElement(), InsertPosition.BEFORE_END);
+  renderElement(footerElement, new FooterStatisticView(filmsCount).getElement(), InsertPosition.BEFORE_END);
 
   renderFilmModal(films[0]);
 };
