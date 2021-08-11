@@ -59,7 +59,7 @@ export const InsertPosition = {
 export const renderElement = (container, element, place) => {
   switch (place) {
     case InsertPosition.AFTER_BEGIN:
-      container.preapend(element);
+      container.prepend(element);
       break;
     case InsertPosition.BEFORE_END:
       container.append(element);
