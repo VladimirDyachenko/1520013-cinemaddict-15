@@ -48,3 +48,34 @@ export const getRuntimeString = (runtimeInMinutes) => {
 
   return hours > 0 ?`${hours}h ${minutes}m` : `${minutes}m`;
 };
+
+export const InsertPosition = {
+  AFTER_BEGIN: 'afterbegin',
+  AFTER_END: 'afterend',
+  BEFORE_BEGIN: 'beforebegin',
+  BEFORE_END: 'beforeend',
+};
+
+export const renderElement = (container, element, place) => {
+  switch (place) {
+    case InsertPosition.AFTER_BEGIN:
+      container.preapend(element);
+      break;
+    case InsertPosition.BEFORE_END:
+      container.append(element);
+      break;
+    default:
+      throw new Error(`Invalid position ${place}`);
+  }
+};
+
+export const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
