@@ -1,6 +1,6 @@
 import SiteMenuView from './view/site-menu.js';
 import FooterStatisticView from './view/footer-statistic.js';
-import { getStatisticsTemplate } from './view/statistic/statistic.js';
+import StatisticView from './view/statistic/statistic.js';
 import UserProfileView from './view/user-profile.js';
 import FilmListView from './view/films/films-list.js';
 import SortListView from './view/films/sort.js';
@@ -27,9 +27,9 @@ const footerElement = document.querySelector('.footer');
 const filmsCount = getRandomPositiveInteger(100000, 1500000);
 
 const renderStatsPage = () => {
-  renderElement(headerElement, new UserProfileView(filterData.watchList.length).getElement(), InsertPosition.BEFORE_END);
+  renderElement(headerElement, new UserProfileView(filterData.historyList.length).getElement(), InsertPosition.BEFORE_END);
   renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
-  renderTemplate(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
+  renderElement(mainElement, new StatisticView(films).getElement(), InsertPosition.BEFORE_END);
   renderElement(footerElement, new FooterStatisticView(filmsCount).getElement(), InsertPosition.BEFORE_END);
 };
 

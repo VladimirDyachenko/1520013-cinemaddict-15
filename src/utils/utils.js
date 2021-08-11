@@ -79,3 +79,20 @@ export const createElement = (template) => {
 
   return newElement.firstChild;
 };
+
+export const getUserRank = (watchedFilmAmount) => {
+
+  if (watchedFilmAmount === 0) {
+    return '';
+  }
+
+  if (watchedFilmAmount < 11) {
+    return 'Novice';
+  }
+
+  if (watchedFilmAmount < 21) {
+    return 'Fan';
+  }
+
+  return 'Movie buff';
+};

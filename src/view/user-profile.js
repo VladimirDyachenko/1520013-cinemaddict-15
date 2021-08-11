@@ -1,24 +1,7 @@
-import { createElement } from '../utils/utils.js';
-
-
-const getUserRating = (watchedFilmAmount) => {
-  if (watchedFilmAmount === 0) {
-    return '';
-  }
-
-  if (watchedFilmAmount < 11) {
-    return 'Novice';
-  }
-
-  if (watchedFilmAmount < 21) {
-    return 'Fan';
-  }
-
-  return 'Movie buff';
-};
+import { createElement, getUserRank } from '../utils/utils.js';
 
 const getUserProfileTemplate = (watchedFilmsAmount) => {
-  const profileRating = getUserRating(watchedFilmsAmount);
+  const profileRating = getUserRank(watchedFilmsAmount);
 
   return `<section class="header__profile profile">
     <p class="profile__rating">${profileRating}</p>
