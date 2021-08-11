@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 
 export const getFilmCardTemplate = (film) => {
+  const MAX_DESCRIPTION_LENGTH = 140;
   const {
     title,
     totalRating,
@@ -18,7 +19,7 @@ export const getFilmCardTemplate = (film) => {
   const year = dayjs(release.date).get('year').toString();
   const duration = getRuntimeString(runtime);
 
-  const shortDescription = description.length > 140 ? `${description.slice(0, 139)}…`
+  const shortDescription = description.length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)}…`
     : description;
 
   const controlActiveClass = 'film-card__controls-item--active';
