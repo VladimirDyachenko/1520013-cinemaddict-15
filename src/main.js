@@ -3,7 +3,7 @@ import FooterStatisticView from './view/footer-statistic.js';
 import { getStatisticsTemplate } from './view/statistic/statistic.js';
 import UserProfileView from './view/user-profile.js';
 import { getFilmsListTemplate } from './view/films/films-list.js';
-import { getSortTemplate } from './view/films/sort.js';
+import SortListView from './view/films/sort.js';
 import { getFilmCardTemplate } from './view/films/film-card.js';
 import { getShowMoreButtonTemplate } from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
@@ -86,7 +86,7 @@ const renderMainPage = () => {
   renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
 
   //Sort list
-  renderTemplate(mainElement, getSortTemplate(), InsertPosition.BEFORE_END);
+  renderElement(mainElement, new SortListView().getElement(), InsertPosition.BEFORE_END);
 
   //Films container
   const filmsList = document.createElement('div');
