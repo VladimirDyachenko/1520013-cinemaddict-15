@@ -6,7 +6,7 @@ import FilmListView from './view/films/films-list.js';
 import SortListView from './view/films/sort.js';
 import FilmCardView from './view/films/film-card.js';
 import ShowMoreButtonView from './view/films/show-more-button.js';
-import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
+import FilmListExtraView from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
 import { getTestData } from './mock/films.js';
 import {
@@ -86,8 +86,8 @@ const renderMainPage = () => {
   showMoreButton.addEventListener('click', showMoreClickHandler);
 
   // Extra lists
-  renderTemplate(filmsList.getElement(), getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
-  renderTemplate(filmsList.getElement(), getFilmsListExtraTemplate(), InsertPosition.BEFORE_END);
+  renderElement(filmsList.getElement(), new FilmListExtraView().getElement(), InsertPosition.BEFORE_END);
+  renderElement(filmsList.getElement(), new FilmListExtraView().getElement(), InsertPosition.BEFORE_END);
 
   mainElement.appendChild(filmsList.getElement());
 
