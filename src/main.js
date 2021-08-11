@@ -25,19 +25,51 @@ const footerElement = document.querySelector('.footer');
 
 const filmsCount = getRandomPositiveInteger(100000, 1500000);
 
+let filmModal;
+
+const closeModal = (onEscKeyDownReference) => {
+  document.removeEventListener('keydown', onEscKeyDownReference);
+  filmModal.removeElement();
+  filmModal = null;
+};
+
+const onEscKeyDown = (event) => {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    closeModal(onEscKeyDown);
+  }
+};
+
+const onCloseClick = () => {
+  closeModal(onEscKeyDown);
+};
+
+const openFilmModal = (filmData) => {
+  //Details modal
+  if (filmModal) {
+    document.removeEventListener('keydown', onEscKeyDown);
+    filmModal.removeElement();
+    filmModal = null;
+  }
+
+  filmModal = new FilmModalView(filmData);
+  renderElement(document.body, filmModal.getElement(), InsertPosition.BEFORE_END);
+
+  document.addEventListener('keydown', onEscKeyDown);
+  filmModal.getElement().querySelector('.film-details__close-btn').addEventListener('click', () => onCloseClick());
+};
+
+const registerModalOpenListeners = (elements, filmData) => {
+  [...elements].forEach((element) => {
+    element.addEventListener('click', () => openFilmModal(filmData));
+  });
+};
+
+
 const renderStatsPage = () => {
   renderElement(headerElement, new UserProfileView(filterData.historyList.length).getElement(), InsertPosition.BEFORE_END);
   renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
   renderElement(mainElement, new StatisticView(films).getElement(), InsertPosition.BEFORE_END);
   renderElement(footerElement, new FooterStatisticView(filmsCount).getElement(), InsertPosition.BEFORE_END);
-};
-
-const renderFilmModal = (filmData) => {
-  //Details modal
-  const filmModal = new FilmModalView(filmData);
-  renderElement(document.body, filmModal.getElement(), InsertPosition.BEFORE_END);
-
-  setTimeout(() => filmModal.removeElement(), 3000);
 };
 
 const renderMainPage = () => {
@@ -48,7 +80,12 @@ const renderMainPage = () => {
 
     return () => {
       for (lastIndex; lastIndex < limit; lastIndex++) {
-        renderElement(containerElement, new FilmCardView((films[lastIndex])).getElement(), InsertPosition.BEFORE_END);
+        const filmCard = new FilmCardView(films[lastIndex]);
+        renderElement(containerElement, filmCard.getElement(), InsertPosition.BEFORE_END);
+
+        const modalTriggers = filmCard.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments');
+
+        registerModalOpenListeners(modalTriggers, filmCard.getFilmData());
       }
       limit = lastIndex + FILMS_PER_ROW < films.length ? lastIndex + FILMS_PER_ROW : films.length;
 
@@ -95,8 +132,6 @@ const renderMainPage = () => {
 
   //Footer statistics
   renderElement(footerElement, new FooterStatisticView(filmsCount).getElement(), InsertPosition.BEFORE_END);
-
-  renderFilmModal(films[0]);
 };
 
 const setPage = (isStatPage = false) => isStatPage ? renderStatsPage() : renderMainPage();
