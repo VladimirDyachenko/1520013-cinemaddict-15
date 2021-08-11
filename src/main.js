@@ -1,7 +1,7 @@
 import SiteMenuView from './view/site-menu.js';
 import { getFooterStatisticsTemplate } from './view/footer-statistic.js';
 import { getStatisticsTemplate } from './view/statistic/statistic.js';
-import { getUserProfileTemplate } from './view/user-profile.js';
+import UserProfileView from './view/user-profile.js';
 import { getFilmsListTemplate } from './view/films/films-list.js';
 import { getSortTemplate } from './view/films/sort.js';
 import { getFilmCardTemplate } from './view/films/film-card.js';
@@ -52,7 +52,7 @@ const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 
 const renderStatsPage = () => {
-  renderTemplate(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
+  renderElement(headerElement, new UserProfileView(filterData.watchList.length).getElement(), InsertPosition.BEFORE_END);
   renderTemplate(mainElement, new SiteMenuView(filterData).getTemplate(), InsertPosition.AFTER_BEGIN);
   renderTemplate(mainElement, getStatisticsTemplate(), InsertPosition.BEFORE_END);
   renderTemplate(footerElement, getFooterStatisticsTemplate(getRandomPositiveInteger(100000, 1500000)), InsertPosition.BEFORE_END);
@@ -80,7 +80,7 @@ const renderMainPage = () => {
   };
 
   //User profile
-  renderTemplate(headerElement, getUserProfileTemplate(), InsertPosition.BEFORE_END);
+  renderElement(headerElement, new UserProfileView(filterData.watchList.length).getElement(), InsertPosition.BEFORE_END);
 
   //Site nav
   renderElement(mainElement, new SiteMenuView(filterData).getElement(), InsertPosition.AFTER_BEGIN);
