@@ -7,7 +7,7 @@ import SortListView from './view/films/sort.js';
 import FilmCardView from './view/films/film-card.js';
 import ShowMoreButtonView from './view/films/show-more-button.js';
 import FilmListExtraView from './view/films/films-list-extra.js';
-import { getFilmModalTemplate } from './view/films/film-modal.js';
+import FilmModalView from './view/films/film-modal.js';
 import { getTestData } from './mock/films.js';
 import {
   getRandomPositiveInteger,
@@ -35,7 +35,10 @@ const renderStatsPage = () => {
 
 const renderFilmModal = (filmData) => {
   //Details modal
-  renderTemplate(document.body, getFilmModalTemplate(filmData), InsertPosition.BEFORE_END);
+  const filmModal = new FilmModalView(filmData);
+  renderElement(document.body, filmModal.getElement(), InsertPosition.BEFORE_END);
+
+  setTimeout(() => filmModal.removeElement(), 3000);
 };
 
 const renderMainPage = () => {
