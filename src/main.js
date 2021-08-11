@@ -5,7 +5,7 @@ import UserProfileView from './view/user-profile.js';
 import { getFilmsListTemplate } from './view/films/films-list.js';
 import SortListView from './view/films/sort.js';
 import { getFilmCardTemplate } from './view/films/film-card.js';
-import { getShowMoreButtonTemplate } from './view/films/show-more-button.js';
+import ShowMoreButtonView from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
 import { generateFilm } from './mock/film-card.js';
@@ -101,7 +101,9 @@ const renderMainPage = () => {
   addFiveFilms();
 
   const filmsListElement = filmsContainerElement.querySelector('.films-list');
-  renderTemplate(filmsListElement, getShowMoreButtonTemplate(), InsertPosition.BEFORE_END);
+
+  const showMoreButton = new ShowMoreButtonView().getElement();
+  renderElement(filmsListElement, showMoreButton, InsertPosition.BEFORE_END);
 
   const showMoreClickHandler = (event) => {
     const filmsLeft = addFiveFilms();
@@ -112,7 +114,6 @@ const renderMainPage = () => {
     }
   };
 
-  const showMoreButton = filmsListElement.querySelector('.films-list__show-more');
   showMoreButton.addEventListener('click', showMoreClickHandler);
 
   //Extra lists
