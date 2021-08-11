@@ -4,7 +4,7 @@ import { getStatisticsTemplate } from './view/statistic/statistic.js';
 import UserProfileView from './view/user-profile.js';
 import FilmListView from './view/films/films-list.js';
 import SortListView from './view/films/sort.js';
-import { getFilmCardTemplate } from './view/films/film-card.js';
+import FilmCardView from './view/films/film-card.js';
 import ShowMoreButtonView from './view/films/show-more-button.js';
 import { getFilmsListExtraTemplate } from './view/films/films-list-extra.js';
 import { getFilmModalTemplate } from './view/films/film-modal.js';
@@ -46,7 +46,7 @@ const renderMainPage = () => {
 
     return () => {
       for (lastIndex; lastIndex < limit; lastIndex++) {
-        renderTemplate(containerElement, getFilmCardTemplate(films[lastIndex]), InsertPosition.BEFORE_END);
+        renderElement(containerElement, new FilmCardView((films[lastIndex])).getElement(), InsertPosition.BEFORE_END);
       }
       limit = lastIndex + FILMS_PER_ROW < films.length ? lastIndex + FILMS_PER_ROW : films.length;
 
