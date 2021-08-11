@@ -12,7 +12,6 @@ import { getTestData } from './mock/films.js';
 import {
   getRandomPositiveInteger,
   InsertPosition,
-  renderTemplate,
   renderElement
 } from './utils/utils.js';
 
