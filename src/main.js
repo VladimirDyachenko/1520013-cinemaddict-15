@@ -17,7 +17,7 @@ import {
 
 const FILMS_PER_ROW = 5;
 
-const [films, filterData] = getTestData();
+const [films, filterData] = getTestData(0);
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
@@ -106,23 +106,28 @@ const renderMainPage = () => {
   const filmsList = new FilmListView();
   renderElement(mainElement, filmsList.getElement(), InsertPosition.BEFORE_END);
 
-  const addFiveFilms = makeRenderFilmsFunction(filmsList.getFilmContainer());
+  if (films.length > 0) {
+    const addFiveFilms = makeRenderFilmsFunction(filmsList.getFilmContainer());
 
-  addFiveFilms();
+    addFiveFilms();
 
-  const showMoreButton = new ShowMoreButtonView().getElement();
-  renderElement(filmsList.getFilmSection(), showMoreButton, InsertPosition.BEFORE_END);
+    const showMoreButton = new ShowMoreButtonView().getElement();
+    renderElement(filmsList.getFilmSection(), showMoreButton, InsertPosition.BEFORE_END);
 
-  const showMoreClickHandler = (event) => {
-    const filmsLeft = addFiveFilms();
+    const showMoreClickHandler = (event) => {
+      const filmsLeft = addFiveFilms();
 
-    if (filmsLeft === 0) {
-      event.target.removeEventListener('click', showMoreClickHandler);
-      event.target.remove();
-    }
-  };
+      if (filmsLeft === 0) {
+        event.target.removeEventListener('click', showMoreClickHandler);
+        event.target.remove();
+      }
+    };
 
-  showMoreButton.addEventListener('click', showMoreClickHandler);
+    showMoreButton.addEventListener('click', showMoreClickHandler);
+  } else {
+    filmsList.showEmptyMessage();
+  }
+
 
   // Extra lists
   renderElement(filmsList.getElement(), new FilmListExtraView().getElement(), InsertPosition.BEFORE_END);

@@ -1,5 +1,7 @@
 import { createElement } from '../../utils/utils.js';
 
+const DEFAULT_EMPTY_MESSAGE = 'There are no movies in our database';
+
 const getFilmsListTemplate = () => (
   `<section class="films">
     <section class="films-list">
@@ -23,6 +25,7 @@ export default class FilmList {
       this._element = createElement(this.getTemplate());
       this._filmListSection = this._element.querySelector('.films-list');
       this._filmListContainer = this._element.querySelector('.films-list__container');
+      this._filmListTitle = this._element.querySelector('.films-list__title');
     }
 
     return this._element;
@@ -48,4 +51,9 @@ export default class FilmList {
     return this._filmListContainer;
   }
 
+  showEmptyMessage(message = DEFAULT_EMPTY_MESSAGE) {
+    this._filmListContainer.remove();
+    this._filmListTitle.textContent = message;
+    this._filmListTitle.classList.remove('visually-hidden');
+  }
 }
