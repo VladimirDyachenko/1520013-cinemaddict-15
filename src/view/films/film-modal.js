@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
+import { createElement } from '../../utils/utils.js';
 import { getRuntimeString } from '../../utils/utils';
 import { getCommentsTemplate } from './comment';
 
-export const getFilmModalTemplate = (filmData) => {
+const getFilmModalTemplate = (filmData) => {
   const {
     title,
     alternativeTitle,
@@ -30,8 +31,7 @@ export const getFilmModalTemplate = (filmData) => {
 
   const controlActiveClass = 'film-details__control-button--active';
   const commentsTemplate = getCommentsTemplate(comments);
-  return `
-  <section class="film-details">
+  return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
       <div class="film-details__close">
@@ -157,6 +157,35 @@ export const getFilmModalTemplate = (filmData) => {
       </section>
     </div>
   </form>
-  </section>
-`;
+  </section>`;
 };
+
+export default class FilmModal {
+  constructor(filmData) {
+    this._element = null;
+    this._film = filmData;
+    this.onInit();
+  }
+
+  onInit() {
+    document.body.classList.add('hide-overflow');
+  }
+
+  getTemplate() {
+    return getFilmModalTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+    document.body.classList.remove('hide-overflow');
+  }
+}

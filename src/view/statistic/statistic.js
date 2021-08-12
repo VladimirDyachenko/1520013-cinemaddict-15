@@ -1,9 +1,11 @@
-export const getStatisticsTemplate = () => (`
-  <section class="statistic">
+import { createElement, getUserRank } from '../../utils/utils.js';
+
+const getStatisticsTemplate = ({rank, totalWatched, totalDuration, topGenre}) => (
+  `<section class="statistic">
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-    <span class="statistic__rank-label">Movie buff</span>
+    <span class="statistic__rank-label">${rank}</span>
   </p>
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -28,15 +30,15 @@ export const getStatisticsTemplate = () => (`
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${totalWatched} <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${Math.floor(totalDuration / 60)}<span class="statistic__item-description">h</span>${totalDuration % 60}<span class="statistic__item-description">m</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">Sci-Fi</p>
+      <p class="statistic__item-text">${topGenre}</p>
     </li>
   </ul>
 
@@ -44,5 +46,64 @@ export const getStatisticsTemplate = () => (`
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
 
-  </section>
-`);
+  </section>`
+);
+
+export default class Statistic {
+  constructor(statisticData) {
+    this._element = null;
+    this.setStatistic(statisticData);
+  }
+
+  getTemplate() {
+    return getStatisticsTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  setStatistic(data) {
+    const genres = {};
+    let totalWatched = 0;
+    let totalDuration = 0;
+    let topGenre = '';
+
+    data.forEach((film) => {
+      if(film.alreadyWatched) {
+        totalWatched++;
+        totalDuration += film.runtime;
+
+        film.genre.forEach((genre) => {
+          if (!genres[genre]) {
+            genres[genre] = 1;
+          } else {
+            genres[genre] += 1;
+          }
+        });
+      }
+    });
+
+    topGenre = Object.entries(genres).reduce((prev, current) => {
+      if (current[1] > prev[1]) {
+        return current;
+      }
+      return prev;
+    }, ['', 0]);
+
+    this._data = {
+      rank: getUserRank(totalWatched),
+      totalWatched,
+      totalDuration,
+      topGenre: topGenre[0],
+    };
+  }
+}
