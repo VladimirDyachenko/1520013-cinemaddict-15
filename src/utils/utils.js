@@ -76,19 +76,17 @@ export const createElement = (template) => {
   return newElement.firstChild;
 };
 
+const RankTrie = {
+  0: '',
+  10: 'Novice',
+  20: 'Fan',
+  21: 'Movie buff',
+};
+
 export const getUserRank = (watchedFilmAmount) => {
-
-  if (watchedFilmAmount === 0) {
-    return '';
+  for(const tire of Object.entries(RankTrie)) {
+    if (watchedFilmAmount <= tire[0]) {
+      return tire[1];
+    }
   }
-
-  if (watchedFilmAmount < 11) {
-    return 'Novice';
-  }
-
-  if (watchedFilmAmount < 21) {
-    return 'Fan';
-  }
-
-  return 'Movie buff';
 };
