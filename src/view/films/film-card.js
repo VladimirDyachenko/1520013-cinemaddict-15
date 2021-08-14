@@ -47,8 +47,8 @@ const getFilmCardTemplate = (film) => {
 export default class FilmCard extends AbstractView {
   constructor(film) {
     super();
-    this._element = null;
     this._film = film;
+    this._openModalHandler = this._openModalHandler.bind(this);
   }
 
   getTemplate() {
@@ -57,5 +57,18 @@ export default class FilmCard extends AbstractView {
 
   getFilmData() {
     return this._film;
+  }
+
+  _openModalHandler() {
+    this._callbacks.openModalClick();
+  }
+
+  setOpenModalHandler(callback) {
+    this._callbacks.openModalClick = callback;
+
+    const modalTriggers = this.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments');
+    [...modalTriggers].forEach((element) => {
+      element.addEventListener('click', this._openModalHandler);
+    });
   }
 }

@@ -165,6 +165,7 @@ export default class FilmModal extends AbstractView {
     super();
     this._film = filmData;
     this.onInit();
+    this._closeModalHandler = this._closeModalHandler.bind(this);
   }
 
   onInit() {
@@ -179,5 +180,17 @@ export default class FilmModal extends AbstractView {
     this._element.remove();
     this._element = null;
     document.body.classList.remove('hide-overflow');
+  }
+
+  _closeModalHandler() {
+    this._callbacks.closeButtonClick();
+  }
+
+  setCloseButtonClick(callback) {
+    this._callbacks.closeButtonClick = callback;
+
+    const button = this.getElement().querySelector('.film-details__close-btn');
+
+    button.addEventListener('click', this._closeModalHandler);
   }
 }

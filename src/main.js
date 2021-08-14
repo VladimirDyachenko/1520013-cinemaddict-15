@@ -15,11 +15,9 @@ import { getRandomPositiveInteger } from './utils/test-data.js';
 const FILMS_PER_ROW = 5;
 
 const [films, filterData] = getTestData();
-
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
-
 const filmsCount = getRandomPositiveInteger(100000, 1500000);
 
 let filmModal;
@@ -43,24 +41,18 @@ const onCloseClick = () => {
 const openFilmModal = (filmData) => {
   //Details modal
   if (filmModal) {
+    //TODO Реализовать обновление в существующем окне вместо создания нового
     document.removeEventListener('keydown', onEscKeyDown);
     filmModal.removeElement();
     filmModal = null;
   }
 
   filmModal = new FilmModalView(filmData);
-  renderElement(document.body, filmModal, InsertPosition.BEFORE_END);
-
   document.addEventListener('keydown', onEscKeyDown);
-  filmModal.getElement().querySelector('.film-details__close-btn').addEventListener('click', () => onCloseClick());
-};
+  filmModal.setCloseButtonClick(() => onCloseClick());
 
-const registerModalOpenListeners = (elements, filmData) => {
-  [...elements].forEach((element) => {
-    element.addEventListener('click', () => openFilmModal(filmData));
-  });
+  renderElement(document.body, filmModal, InsertPosition.BEFORE_END);
 };
-
 
 const renderStatsPage = () => {
   renderElement(headerElement, new UserProfileView(filterData.historyList.length), InsertPosition.BEFORE_END);
@@ -78,11 +70,9 @@ const renderMainPage = () => {
     return () => {
       for (lastIndex; lastIndex < limit; lastIndex++) {
         const filmCard = new FilmCardView(films[lastIndex]);
+        filmCard.setOpenModalHandler(() => openFilmModal(filmCard.getFilmData()));
+
         renderElement(containerElement, filmCard, InsertPosition.BEFORE_END);
-
-        const modalTriggers = filmCard.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments');
-
-        registerModalOpenListeners(modalTriggers, filmCard.getFilmData());
       }
       limit = lastIndex + FILMS_PER_ROW < films.length ? lastIndex + FILMS_PER_ROW : films.length;
 
@@ -108,19 +98,18 @@ const renderMainPage = () => {
 
     addFiveFilms();
 
-    const showMoreButton = new ShowMoreButtonView().getElement();
+    const showMoreButton = new ShowMoreButtonView();
     renderElement(filmsList.getFilmSection(), showMoreButton, InsertPosition.BEFORE_END);
 
     const showMoreClickHandler = (event) => {
       const filmsLeft = addFiveFilms();
 
       if (filmsLeft === 0) {
-        event.target.removeEventListener('click', showMoreClickHandler);
         event.target.remove();
       }
     };
 
-    showMoreButton.addEventListener('click', showMoreClickHandler);
+    showMoreButton.setClickHandler(showMoreClickHandler);
   } else {
     filmsList.showEmptyMessage();
   }
