@@ -51,8 +51,6 @@ export const getRuntimeString = (runtimeInMinutes) => {
 
 export const InsertPosition = {
   AFTER_BEGIN: 'afterbegin',
-  AFTER_END: 'afterend',
-  BEFORE_BEGIN: 'beforebegin',
   BEFORE_END: 'beforeend',
 };
 
