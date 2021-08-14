@@ -5,7 +5,7 @@ import {
   getRandomArrayElement,
   getRandomArray,
   getRandomDate
-} from '../utils/utils.js';
+} from '../utils/test-data.js';
 
 const TitlePosterPairs = {
   'Made for each other': 'made-for-each-other.png',

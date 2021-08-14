@@ -1,4 +1,4 @@
-import { createElement } from '../../utils/utils.js';
+import { createElement } from '../../utils/dom';
 import AbstractView from '../abstract-view.js';
 
 const DEFAULT_EMPTY_MESSAGE = 'There are no movies in our database';
