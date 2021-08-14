@@ -17,7 +17,7 @@ import {
 
 const FILMS_PER_ROW = 5;
 
-const [films, filterData] = getTestData(0);
+const [films, filterData] = getTestData();
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');

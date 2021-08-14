@@ -1,4 +1,5 @@
 import { createElement } from '../../utils/utils.js';
+import AbstractView from '../abstract-view.js';
 
 const DEFAULT_EMPTY_MESSAGE = 'There are no movies in our database';
 
@@ -11,10 +12,7 @@ const getFilmsListTemplate = () => (
   </section>`
 );
 
-export default class FilmList {
-  constructor() {
-    this._element = null;
-  }
+export default class FilmList extends AbstractView {
 
   getTemplate() {
     return getFilmsListTemplate();
@@ -29,10 +27,6 @@ export default class FilmList {
     }
 
     return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getFilmSection() {

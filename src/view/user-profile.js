@@ -1,4 +1,5 @@
-import { createElement, getUserRank } from '../utils/utils.js';
+import { getUserRank } from '../utils/utils.js';
+import AbstractView from './abstract-view.js';
 
 const getUserProfileTemplate = (watchedFilmsAmount) => {
   const profileRating = getUserRank(watchedFilmsAmount);
@@ -9,25 +10,13 @@ const getUserProfileTemplate = (watchedFilmsAmount) => {
   </section>`;
 };
 
-export default class UserProfile {
+export default class UserProfile extends AbstractView {
   constructor(watchedFilmsAmount) {
-    this._element = null;
+    super();
     this._watchedFilmsAmount = watchedFilmsAmount;
   }
 
   getTemplate() {
     return getUserProfileTemplate(this._watchedFilmsAmount);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
