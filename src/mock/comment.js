@@ -3,7 +3,7 @@ import {
   getRandomPositiveInteger,
   getRandomArrayElement,
   getRandomDate
-} from '../utils/utils.js';
+} from '../utils/test-data.js';
 
 const emotes = [
   'smile',

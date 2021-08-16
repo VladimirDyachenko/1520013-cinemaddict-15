@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import { createElement } from '../../utils/utils.js';
 import { getRuntimeString } from '../../utils/utils';
 import { getCommentsTemplate } from './comment';
+import AbstractView from '../abstract-view.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
@@ -160,11 +160,12 @@ const getFilmModalTemplate = (filmData) => {
   </section>`;
 };
 
-export default class FilmModal {
+export default class FilmModal extends AbstractView {
   constructor(filmData) {
-    this._element = null;
+    super();
     this._film = filmData;
     this.onInit();
+    this._closeModalHandler = this._closeModalHandler.bind(this);
   }
 
   onInit() {
@@ -175,17 +176,21 @@ export default class FilmModal {
     return getFilmModalTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
   removeElement() {
     this._element.remove();
     this._element = null;
     document.body.classList.remove('hide-overflow');
+  }
+
+  _closeModalHandler() {
+    this._callbacks.closeButtonClick();
+  }
+
+  setCloseButtonClick(callback) {
+    this._callbacks.closeButtonClick = callback;
+
+    const button = this.getElement().querySelector('.film-details__close-btn');
+
+    button.addEventListener('click', this._closeModalHandler);
   }
 }

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
-import { createElement } from '../../utils/utils.js';
+import AbstractView from '../abstract-view.js';
 
 const getFilmCardTemplate = (film) => {
   const MAX_DESCRIPTION_LENGTH = 140;
@@ -44,29 +44,31 @@ const getFilmCardTemplate = (film) => {
   </article>`;
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractView {
   constructor(film) {
-    this._element = null;
+    super();
     this._film = film;
+    this._openModalHandler = this._openModalHandler.bind(this);
   }
 
   getTemplate() {
     return getFilmCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
   getFilmData() {
     return this._film;
+  }
+
+  _openModalHandler() {
+    this._callbacks.openModalClick();
+  }
+
+  setOpenModalHandler(callback) {
+    this._callbacks.openModalClick = callback;
+
+    const modalTriggers = this.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments');
+    [...modalTriggers].forEach((element) => {
+      element.addEventListener('click', this._openModalHandler);
+    });
   }
 }
