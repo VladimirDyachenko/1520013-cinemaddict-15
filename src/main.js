@@ -8,7 +8,7 @@ const [films, filterData] = getTestData();
 const mainElement = document.querySelector('.main');
 const filmsCount = getRandomPositiveInteger(100000, 1500000);
 
-const sharedPresentor = new SharedPresentor(filmsCount, filterData.watchList.length);
+const sharedPresentor = new SharedPresentor(filmsCount, filterData.historyList.length);
 sharedPresentor.init();
 
 const renderStatsPage = () => {
