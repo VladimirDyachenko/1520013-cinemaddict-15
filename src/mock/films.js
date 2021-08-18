@@ -6,6 +6,7 @@ import {
   getRandomArray,
   getRandomDate
 } from '../utils/test-data.js';
+import { nanoid } from 'nanoid';
 
 const TitlePosterPairs = {
   'Made for each other': 'made-for-each-other.png',
@@ -90,6 +91,7 @@ const generateFilm = () => {
   alreadyWatched ? watchingDate = getRandomDate(-7, -12, -2) : null;
 
   return {
+    id: nanoid(),
     title: title,
     alternativeTitle: `${title} alternative title`,
     totalRating: getRandomPositiveFloat(0, 10, 1),

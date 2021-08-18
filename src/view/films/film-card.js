@@ -71,4 +71,10 @@ export default class FilmCard extends AbstractView {
       element.addEventListener('click', this._openModalHandler);
     });
   }
+
+  removeElement() {
+    this._element.removeEventListener('click', this._openModalHandler);
+    this._element.remove();
+    this._element = null;
+  }
 }

@@ -11,6 +11,7 @@ const FILMS_PER_ROW = 5;
 
 export default class FilmList {
   constructor(listContainer, filmData, sortedFilmData) {
+    //Initial
     this._listContainer = listContainer;
     this._filmData = filmData;
     this._sortedFilmData = sortedFilmData;
@@ -25,6 +26,7 @@ export default class FilmList {
     //Other
     this._lastRenderedFilmCardIndex = 0;
     this._limit = FILMS_PER_ROW;
+    this._renderedCards = new Map();
 
     //Event handlers
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
@@ -54,10 +56,12 @@ export default class FilmList {
 
   _renderFilmCardsRow() {
     for(this._lastRenderedFilmCardIndex; this._lastRenderedFilmCardIndex < this._limit; this._lastRenderedFilmCardIndex++) {
-      const filmCard = new FilmCardView(this._filmData[this._lastRenderedFilmCardIndex]);
+      const filmData = this._filmData[this._lastRenderedFilmCardIndex];
+      const filmCard = new FilmCardView(filmData);
       filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.getFilmData()));
 
       renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
+      this._renderedCards.set(filmData.id, filmCard);
     }
 
     this._limit = this._lastRenderedFilmCardIndex + FILMS_PER_ROW < this._filmData.length ?
@@ -65,6 +69,13 @@ export default class FilmList {
       this._filmData.length;
 
     return this._filmData.length - this._lastRenderedFilmCardIndex;
+  }
+
+  _clearFilmList() {
+    this._renderedCards.forEach((cardView) => cardView.removeElement());
+    this._renderedCards.clear();
+    this._limit = FILMS_PER_ROW;
+    this._lastRenderedFilmCardIndex = 0;
   }
 
   _renderShowMore() {
