@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils';
 import { getCommentsTemplate } from './comment';
 import AbstractView from '../abstract-view.js';
+import { FilmControlAction } from '../../utils/utils.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
@@ -167,6 +168,11 @@ export default class FilmModal extends AbstractView {
     this.onInit();
     this._closeModalHandler = this._closeModalHandler.bind(this);
     this._controlClickHandler = this._controlClickHandler.bind(this);
+    this._controlActiveClass = 'film-details__control-button--active';
+    this._controlWatchlistClass = 'film-details__control-button--watchlist';
+    this._controlWatchedClass = 'film-details__control-button--watched';
+    this._controlFavoriteClass = 'film-details__control-button--favorite';
+
   }
 
   get filmData() {
@@ -199,12 +205,12 @@ export default class FilmModal extends AbstractView {
     const data = { action: undefined, filmData: this._film };
     const classList = event.target.classList;
 
-    if (classList.contains('film-details__control-button--watchlist')) {
-      data.action = 'addToWatchList';
-    } else if (classList.contains('film-details__control-button--watched')) {
-      data.action = 'markAsWatched';
-    } else if (classList.contains('film-details__control-button--favorite')) {
-      data.action = 'markAsFavorite';
+    if (classList.contains(this._controlWatchlistClass)) {
+      data.action = FilmControlAction.watchlist;
+    } else if (classList.contains(this._controlWatchedClass)) {
+      data.action = FilmControlAction.watched;
+    } else if (classList.contains(this._controlFavoriteClass)) {
+      data.action = FilmControlAction.favorite;
     }
     this._callbacks.controlClick(data);
   }
@@ -220,20 +226,20 @@ export default class FilmModal extends AbstractView {
   updateControl(action) {
     let button;
     switch (action) {
-      case 'addToWatchList':
-        button = this._element.querySelector('.film-details__control-button--watchlist');
+      case FilmControlAction.watchlist:
+        button = this._element.querySelector(`.${this._controlWatchlistClass}`);
         break;
-      case 'markAsWatched':
-        button = this._element.querySelector('.film-details__control-button--watched');
+      case FilmControlAction.watched:
+        button = this._element.querySelector(`.${this._controlWatchedClass}`);
         break;
-      case 'markAsFavorite':
-        button = this._element.querySelector('.film-details__control-button--favorite');
+      case FilmControlAction.favorite:
+        button = this._element.querySelector(`.${this._controlFavoriteClass}`);
         break;
       default:
         throw new Error(`Unhandled action: ${action}`);
     }
 
-    button.classList.toggle('film-details__control-button--active');
+    button.classList.toggle(this._controlActiveClass);
   }
 
   removeElement() {

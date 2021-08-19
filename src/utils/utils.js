@@ -23,3 +23,9 @@ export const getUserRank = (watchedFilmAmount) => {
 
   return tires[tires.length - 1][1];
 };
+
+export const FilmControlAction = {
+  watchlist: 'toggleWatchList',
+  watched: 'toggleWatched',
+  favorite: 'toggleFavotite',
+};

@@ -7,6 +7,7 @@ import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
 import { updateFilm } from '../mock/films.js';
+import { FilmControlAction } from '../utils/utils.js';
 
 const FILMS_PER_ROW = 5;
 
@@ -135,13 +136,13 @@ export default class FilmList {
 
   _filmControlClickHandler(payload) {
     switch (payload.action) {
-      case 'addToWatchList':
+      case FilmControlAction.watchlist:
         payload.filmData.watchlist = !payload.filmData.watchlist;
         break;
-      case 'markAsWatched':
+      case FilmControlAction.watched:
         payload.filmData.alreadyWatched = !payload.filmData.alreadyWatched;
         break;
-      case 'markAsFavorite':
+      case FilmControlAction.favorite:
         payload.filmData.favorite = !payload.filmData.favorite;
         break;
       default:
