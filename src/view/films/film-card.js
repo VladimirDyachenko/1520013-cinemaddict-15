@@ -49,18 +49,36 @@ export default class FilmCard extends AbstractView {
     super();
     this._film = film;
     this._openModalHandler = this._openModalHandler.bind(this);
+    this._controlClickHandler = this._controlClickHandler.bind(this);
   }
 
   getTemplate() {
     return getFilmCardTemplate(this._film);
   }
 
-  getFilmData() {
+  get filmData() {
     return this._film;
+  }
+
+  set filmData(filmData) {
+    this._film = filmData;
   }
 
   _openModalHandler() {
     this._callbacks.openModalClick();
+  }
+
+  _controlClickHandler(event) {
+    const data = { action: undefined, filmData: this._film };
+    const classList = event.target.classList;
+    if (classList.contains('film-card__controls-item--add-to-watchlist')) {
+      data.action = 'addToWatchList';
+    } else if (classList.contains('film-card__controls-item--mark-as-watched')) {
+      data.action = 'markAsWatched';
+    } else if (classList.contains('film-card__controls-item--favorite')) {
+      data.action = 'markAsFavorite';
+    }
+    this._callbacks.controlClick(data);
   }
 
   setOpenModalHandler(callback) {
@@ -72,8 +90,38 @@ export default class FilmCard extends AbstractView {
     });
   }
 
+  setControlClickHandler(callback) {
+    this._callbacks.controlClick = callback;
+    this._controlButtons = [...this.getElement().querySelectorAll('.film-card__controls-item')];
+    this._controlButtons.forEach((button) => {
+      button.addEventListener('click', this._controlClickHandler);
+    });
+  }
+
+  updateControl(action) {
+    let button;
+    switch (action) {
+      case 'addToWatchList':
+        button = this._element.querySelector('.film-card__controls-item--add-to-watchlist');
+        break;
+      case 'markAsWatched':
+        button = this._element.querySelector('.film-card__controls-item--mark-as-watched');
+        break;
+      case 'markAsFavorite':
+        button = this._element.querySelector('.film-card__controls-item--favorite');
+        break;
+      default:
+        throw new Error(`Unhandled action: ${action}`);
+    }
+
+    button.classList.toggle('film-card__controls-item--active');
+  }
+
   removeElement() {
     this._element.removeEventListener('click', this._openModalHandler);
+    this._controlButtons.forEach((button) => {
+      button.removeEventListener('click', this._controlClickHandler);
+    });
     this._element.remove();
     this._element = null;
   }

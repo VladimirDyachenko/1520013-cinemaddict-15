@@ -6,6 +6,7 @@ import ShowMoreButtonView from '../view/films/show-more-button.js';
 import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
+import { updateFilm } from '../mock/films.js';
 
 const FILMS_PER_ROW = 5;
 
@@ -31,6 +32,7 @@ export default class FilmList {
     //Event handlers
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
     this._showMoreClickHandler = this._showMoreClickHandler.bind(this);
+    this._filmControlClickHandler = this._filmControlClickHandler.bind(this);
   }
 
   init() {
@@ -58,7 +60,8 @@ export default class FilmList {
     for(this._lastRenderedFilmCardIndex; this._lastRenderedFilmCardIndex < this._limit; this._lastRenderedFilmCardIndex++) {
       const filmData = this._filmData[this._lastRenderedFilmCardIndex];
       const filmCard = new FilmCardView(filmData);
-      filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.getFilmData()));
+      filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.filmData));
+      filmCard.setControlClickHandler(this._filmControlClickHandler);
 
       renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
       this._renderedCards.set(filmData.id, filmCard);
@@ -110,6 +113,7 @@ export default class FilmList {
     this._filmModal = new FilmModalView(filmData);
     document.addEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
+    this._filmModal.setControlClickHandler(this._filmControlClickHandler);
     this._renderFilmModal();
   }
 
@@ -127,5 +131,35 @@ export default class FilmList {
 
   _onModalCloseClick() {
     this._closeFilmModal();
+  }
+
+  _filmControlClickHandler(payload) {
+    switch (payload.action) {
+      case 'addToWatchList':
+        payload.filmData.watchlist = !payload.filmData.watchlist;
+        break;
+      case 'markAsWatched':
+        payload.filmData.alreadyWatched = !payload.filmData.alreadyWatched;
+        break;
+      case 'markAsFavorite':
+        payload.filmData.favorite = !payload.filmData.favorite;
+        break;
+      default:
+        throw new Error(`Unhandled action: ${payload.action}`);
+    }
+
+    this._filmData = updateFilm(this._filmData, payload.filmData);
+
+    const filmCard = this._renderedCards.get(payload.filmData.id);
+
+    if (filmCard) {
+      filmCard.filmData = payload.filmData;
+      filmCard.updateControl(payload.action);
+    }
+
+    if (this._filmModal !== null && this._filmModal.filmData.id === payload.filmData.id) {
+      this._filmModal.filmData = payload.filmData;
+      this._filmModal.updateControl(payload.action);
+    }
   }
 }

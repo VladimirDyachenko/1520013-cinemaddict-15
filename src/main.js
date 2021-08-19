@@ -1,5 +1,5 @@
 import StatisticPresentor from './presenter/statistic-page.js';
-import FilmListPagePresenter from './presenter/movie-page.js';
+import FilmListPresenter from './presenter/film-list.js';
 import SharedPresentor from './presenter/shared.js';
 import { getTestData } from './mock/films.js';
 import { getRandomPositiveInteger } from './utils/test-data.js';
@@ -17,7 +17,7 @@ const renderStatsPage = () => {
 };
 
 const renderMainPage = () => {
-  const movieListPresenter = new FilmListPagePresenter(mainElement, films, filterData);
+  const movieListPresenter = new FilmListPresenter(mainElement, films, filterData);
   movieListPresenter.init();
 };
 
