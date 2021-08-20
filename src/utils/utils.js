@@ -14,9 +14,18 @@ const RankTrie = {
 };
 
 export const getUserRank = (watchedFilmAmount) => {
-  for(const tire of Object.entries(RankTrie)) {
+  const tires = Object.entries(RankTrie);
+  for(const tire of tires) {
     if (watchedFilmAmount <= tire[0]) {
       return tire[1];
     }
   }
+
+  return tires[tires.length - 1][1];
+};
+
+export const FilmControlAction = {
+  watchlist: 'toggleWatchList',
+  watched: 'toggleWatched',
+  favorite: 'toggleFavotite',
 };

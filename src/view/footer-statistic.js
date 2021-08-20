@@ -1,9 +1,7 @@
 import AbstractView from './abstract-view.js';
 
 const getFooterStatisticsTemplate = (showCount) => (
-  `<section class="footer__statistics">
-    <p>${showCount} movies inside</p>
-  </section>`
+  `<p>${showCount} movies inside</p>`
 );
 
 export default class FooterStatistic extends AbstractView {

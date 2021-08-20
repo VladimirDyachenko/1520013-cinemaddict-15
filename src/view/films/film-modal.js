@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils';
 import { getCommentsTemplate } from './comment';
 import AbstractView from '../abstract-view.js';
+import { FilmControlAction } from '../../utils/utils.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
@@ -166,6 +167,20 @@ export default class FilmModal extends AbstractView {
     this._film = filmData;
     this.onInit();
     this._closeModalHandler = this._closeModalHandler.bind(this);
+    this._controlClickHandler = this._controlClickHandler.bind(this);
+    this._controlActiveClass = 'film-details__control-button--active';
+    this._controlWatchlistClass = 'film-details__control-button--watchlist';
+    this._controlWatchedClass = 'film-details__control-button--watched';
+    this._controlFavoriteClass = 'film-details__control-button--favorite';
+
+  }
+
+  get filmData() {
+    return this._film;
+  }
+
+  set filmData(filmData) {
+    this._film = filmData;
   }
 
   onInit() {
@@ -176,21 +191,64 @@ export default class FilmModal extends AbstractView {
     return getFilmModalTemplate(this._film);
   }
 
-  removeElement() {
-    this._element.remove();
-    this._element = null;
-    document.body.classList.remove('hide-overflow');
-  }
-
   _closeModalHandler() {
     this._callbacks.closeButtonClick();
   }
 
   setCloseButtonClick(callback) {
     this._callbacks.closeButtonClick = callback;
+    this._closeButton = this.getElement().querySelector('.film-details__close-btn');
+    this._closeButton.addEventListener('click', this._closeModalHandler);
+  }
 
-    const button = this.getElement().querySelector('.film-details__close-btn');
+  _controlClickHandler(event) {
+    const data = { action: undefined, filmData: this._film };
+    const classList = event.target.classList;
 
-    button.addEventListener('click', this._closeModalHandler);
+    if (classList.contains(this._controlWatchlistClass)) {
+      data.action = FilmControlAction.watchlist;
+    } else if (classList.contains(this._controlWatchedClass)) {
+      data.action = FilmControlAction.watched;
+    } else if (classList.contains(this._controlFavoriteClass)) {
+      data.action = FilmControlAction.favorite;
+    }
+    this._callbacks.controlClick(data);
+  }
+
+  setControlClickHandler(callback) {
+    this._callbacks.controlClick = callback;
+    this._controlButtons = [...this.getElement().querySelectorAll('.film-details__control-button')];
+    this._controlButtons.forEach((button) => {
+      button.addEventListener('click', this._controlClickHandler);
+    });
+  }
+
+  updateControl(action) {
+    let button;
+    switch (action) {
+      case FilmControlAction.watchlist:
+        button = this._element.querySelector(`.${this._controlWatchlistClass}`);
+        break;
+      case FilmControlAction.watched:
+        button = this._element.querySelector(`.${this._controlWatchedClass}`);
+        break;
+      case FilmControlAction.favorite:
+        button = this._element.querySelector(`.${this._controlFavoriteClass}`);
+        break;
+      default:
+        throw new Error(`Unhandled action: ${action}`);
+    }
+
+    button.classList.toggle(this._controlActiveClass);
+  }
+
+  removeElement() {
+    this._closeButton.removeEventListener('click', this._closeModalHandler);
+    this._controlButtons.forEach((button) => {
+      button.removeEventListener('click', this._controlClickHandler);
+    });
+    this._element.remove();
+    this._element = null;
+    document.body.classList.remove('hide-overflow');
   }
 }
