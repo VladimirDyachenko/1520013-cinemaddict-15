@@ -1,16 +1,10 @@
+import { RankTrie } from '../const.js';
 
 export const getRuntimeString = (runtimeInMinutes) => {
   const hours = Math.floor(runtimeInMinutes / 60);
   const minutes = runtimeInMinutes % 60;
 
   return hours > 0 ?`${hours}h ${minutes}m` : `${minutes}m`;
-};
-
-const RankTrie = {
-  0: '',
-  10: 'Novice',
-  20: 'Fan',
-  21: 'Movie buff',
 };
 
 export const getUserRank = (watchedFilmAmount) => {
@@ -22,10 +16,4 @@ export const getUserRank = (watchedFilmAmount) => {
   }
 
   return tires[tires.length - 1][1];
-};
-
-export const FilmControlAction = {
-  watchlist: 'toggleWatchList',
-  watched: 'toggleWatched',
-  favorite: 'toggleFavotite',
 };

@@ -7,11 +7,9 @@ import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
 import { updateFilm } from '../mock/films.js';
-import { FilmControlAction } from '../utils/utils.js';
+import { FilmControlAction, FILMS_PER_ROW } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType } from '../const.js';
-
-const FILMS_PER_ROW = 5;
 
 export default class FilmList {
   constructor(listContainer, filmData, sortedFilmData) {
