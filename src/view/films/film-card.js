@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 import AbstractView from '../abstract-view.js';
-import { FilmControlAction } from '../../utils/utils.js';
+import { FilmControlAction } from '../../const.js';
 
 const getFilmCardTemplate = (film) => {
   const MAX_DESCRIPTION_LENGTH = 140;

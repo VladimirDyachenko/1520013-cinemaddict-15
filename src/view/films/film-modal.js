@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
-import { getRuntimeString } from '../../utils/utils';
-import { getCommentsTemplate } from './comment';
+import { getRuntimeString } from '../../utils/utils.js';
+import { getCommentsTemplate } from './comment.js';
 import AbstractView from '../abstract-view.js';
-import { FilmControlAction } from '../../utils/utils.js';
+import { FilmControlAction } from '../../const.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
