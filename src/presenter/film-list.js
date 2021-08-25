@@ -117,9 +117,11 @@ export default class FilmList {
 
   _openFilmModal(filmData) {
     if (this._filmModal !== null) {
-      document.removeEventListener('keydown', this._onEscKeyDownHandler);
-      this._filmModal.removeElement();
-      this._filmModal = null;
+      //Обновляем так чтобы при открытии нового модального окна
+      //сбросить состояние формы комментария
+      this._filmModal.filmData = filmData;
+      this._filmModal.updateData({}, true);
+      return;
     }
 
     this._filmModal = new FilmModalView(filmData);
@@ -131,7 +133,7 @@ export default class FilmList {
 
   _closeFilmModal() {
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
-    this._filmModal.removeElement();
+    this._filmModal.destroyElement();
     this._filmModal = null;
   }
 

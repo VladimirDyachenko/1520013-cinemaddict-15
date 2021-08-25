@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 import { getCommentsTemplate } from './comment.js';
-import AbstractView from '../abstract-view.js';
+import SmartView from '../smart-view.js';
 import { FilmControlAction } from '../../const.js';
 
 const getFilmModalTemplate = (filmData) => {
@@ -18,10 +18,13 @@ const getFilmModalTemplate = (filmData) => {
     runtime,
     genre,
     description,
-    watchlist,
-    alreadyWatched,
-    favorite,
     comments,
+    isComments,
+    isWatchlist,
+    isAlreadyWatched,
+    isFavorite,
+    selectedEmoji,
+    commentText,
   } = filmData;
 
   const releaseDate = dayjs(release.date).format('D MMMM YYYY').toString();
@@ -31,7 +34,8 @@ const getFilmModalTemplate = (filmData) => {
     .join('');
 
   const controlActiveClass = 'film-details__control-button--active';
-  const commentsTemplate = getCommentsTemplate(comments);
+  const commentsTemplate = isComments ? getCommentsTemplate(comments) : '';
+
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
@@ -95,14 +99,14 @@ const getFilmModalTemplate = (filmData) => {
       <section class="film-details__controls">
         <button type="button" class="film-details__control-button
           film-details__control-button--watchlist
-          ${watchlist ? controlActiveClass : ''}"
+          ${isWatchlist ? controlActiveClass : ''}"
           id="watchlist" name="watchlist"
         >
           Add to watchlist
         </button>
         <button type="button" class="film-details__control-button
           film-details__control-button--watched
-          ${alreadyWatched ? controlActiveClass : ''}"
+          ${isAlreadyWatched ? controlActiveClass : ''}"
           id="watched"
           name="watched"
         >
@@ -111,7 +115,7 @@ const getFilmModalTemplate = (filmData) => {
         <button type="button"
           class="film-details__control-button
           film-details__control-button--favorite
-          ${favorite ? controlActiveClass : ''}"
+          ${isFavorite ? controlActiveClass : ''}"
           id="favorite"
           name="favorite"
         >
@@ -124,32 +128,34 @@ const getFilmModalTemplate = (filmData) => {
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
-        <ul class="film-details__comments-list">${commentsTemplate}</ul>
+        <ul class="film-details__comments-list">${isComments ? commentsTemplate : ''}</ul>
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">
+          ${selectedEmoji ? `<img src="images/emoji/${selectedEmoji}.png" width="55" height="55" alt="emoji-${selectedEmoji}"></img>` :''}
+          </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText ? commentText : ''}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${selectedEmoji === 'smile' ? 'checked': ''}>
             <label class="film-details__emoji-label" for="emoji-smile">
               <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${selectedEmoji === 'sleeping' ? 'checked': ''}>
             <label class="film-details__emoji-label" for="emoji-sleeping">
               <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${selectedEmoji === 'puke' ? 'checked': ''}>
             <label class="film-details__emoji-label" for="emoji-puke">
               <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${selectedEmoji === 'angry' ? 'checked': ''}>
             <label class="film-details__emoji-label" for="emoji-angry">
               <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
             </label>
@@ -161,34 +167,37 @@ const getFilmModalTemplate = (filmData) => {
   </section>`;
 };
 
-export default class FilmModal extends AbstractView {
-  constructor(filmData) {
+export default class FilmModal extends SmartView {
+  constructor(data) {
     super();
-    this._film = filmData;
-    this.onInit();
+    this._data = FilmModal.parseFilmToData(data);
     this._closeModalHandler = this._closeModalHandler.bind(this);
     this._controlClickHandler = this._controlClickHandler.bind(this);
+    this._emojiPickHandler = this._emojiPickHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
     this._controlActiveClass = 'film-details__control-button--active';
     this._controlWatchlistClass = 'film-details__control-button--watchlist';
     this._controlWatchedClass = 'film-details__control-button--watched';
     this._controlFavoriteClass = 'film-details__control-button--favorite';
 
+    this.onInit();
   }
 
   get filmData() {
-    return this._film;
+    return FilmModal.parseDataToFilm(this._data);
   }
 
-  set filmData(filmData) {
-    this._film = filmData;
+  set filmData(film) {
+    this._data = FilmModal.parseFilmToData(film);
   }
 
   onInit() {
     document.body.classList.add('hide-overflow');
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return getFilmModalTemplate(this._film);
+    return getFilmModalTemplate(this._data);
   }
 
   _closeModalHandler() {
@@ -202,7 +211,7 @@ export default class FilmModal extends AbstractView {
   }
 
   _controlClickHandler(event) {
-    const data = { action: undefined, filmData: this._film };
+    const data = { action: undefined, filmData: this.filmData };
     const classList = event.target.classList;
 
     if (classList.contains(this._controlWatchlistClass)) {
@@ -242,7 +251,36 @@ export default class FilmModal extends AbstractView {
     button.classList.toggle(this._controlActiveClass);
   }
 
-  removeElement() {
+  _emojiPickHandler(event) {
+    event.preventDefault();
+    const updatedData = Object.assign({}, this._data, { selectedEmoji: event.target.value });
+    this.updateData(updatedData, true);
+  }
+
+  _commentInputHandler(event) {
+    const updatedData = Object.assign({}, this.data, { commentText: event.target.value });
+    this.updateData(updatedData, false);
+  }
+
+  _setInnerHandlers() {
+    const emojiInputs = this.getElement().querySelectorAll('.film-details__emoji-item');
+
+    [...emojiInputs].forEach((element) => {
+      element.addEventListener('input', this._emojiPickHandler);
+    });
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('input', this._commentInputHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseButtonClick(this._callbacks.closeButtonClick);
+    this.setControlClickHandler(this._callbacks.controlClick);
+  }
+
+  destroyElement() {
     this._closeButton.removeEventListener('click', this._closeModalHandler);
     this._controlButtons.forEach((button) => {
       button.removeEventListener('click', this._controlClickHandler);
@@ -250,5 +288,33 @@ export default class FilmModal extends AbstractView {
     this._element.remove();
     this._element = null;
     document.body.classList.remove('hide-overflow');
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+      {},
+      film,
+      {
+        isComments: film.comments.length > 0,
+        isWatchlist: film.watchlist,
+        isAlreadyWatched: film.alreadyWatched,
+        isFavorite: film.favorite,
+        selectedEmoji: undefined,
+        commentText: '',
+      },
+    );
+  }
+
+  static parseDataToFilm(data) {
+    data = Object.assign({}, data);
+
+    delete data.isComments;
+    delete data.isWatchlist;
+    delete data.isAlreadyWatched;
+    delete data.isFavorite;
+    delete data.selectedEmoji;
+    delete data.commentText;
+
+    return data;
   }
 }
