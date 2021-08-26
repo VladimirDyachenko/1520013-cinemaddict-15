@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
+import * as relativeTimePlugin from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTimePlugin);
 
 const getCommentTemplate = (comment) => {
-  const dateString = dayjs(comment.date).format('YYYY/MM/DD h:mm').toString();
+  const dateString = dayjs().to(dayjs(comment.date));
 
   return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
