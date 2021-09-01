@@ -3,10 +3,11 @@ import StatisticView from '../view/statistic/statistic.js';
 import { InsertPosition, renderElement } from '../utils/dom.js';
 
 export default class Statistic {
-  constructor(containerElement, filmData, filmFilterData) {
+  constructor(containerElement, moviesModel) {
+    this._moviesModel = moviesModel;
     this._containerElement = containerElement;
-    this._films = filmData;
-    this._filmsFilterData = filmFilterData;
+    this._films = this._moviesModel.movies;
+    this._filmsFilterData = this._moviesModel.getFiltredMovies();
     this._siteMenuView = new SiteMenuView(this._filmsFilterData);
     this._statisticView = new StatisticView(this._films);
   }

@@ -6,18 +6,17 @@ import ShowMoreButtonView from '../view/films/show-more-button.js';
 import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
-import { updateFilm } from '../mock/films.js';
 import { FilmControlAction, FILMS_PER_ROW } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType } from '../const.js';
 
 export default class FilmList {
-  constructor(listContainer, filmData, sortedFilmData) {
+  constructor(listContainer, moviesModel) {
     //Initial
+    this._moviesModel = moviesModel;
     this._listContainer = listContainer;
-    this._filmDataSource = filmData;
-    this._filmData = [...this._filmDataSource];
-    this._sortedFilmData = sortedFilmData;
+    this._filmData = this._moviesModel.movies;
+    this._sortedFilmData = this._moviesModel.getFiltredMovies();
 
     //Views
     this._siteMenu = new SiteMenuView(this._sortedFilmData);
@@ -162,7 +161,9 @@ export default class FilmList {
         throw new Error(`Unhandled action: ${payload.action}`);
     }
 
-    this._filmData = updateFilm(this._filmData, payload.filmData);
+    this._moviesModel.updateMovie(payload.filmData);
+    this._filmData = this._moviesModel.movies;
+    this._sortedFilmData = this._moviesModel.getFiltredMovies();
 
     const filmCard = this._renderedCards.get(payload.filmData.id);
 
@@ -186,7 +187,7 @@ export default class FilmList {
         this._filmData.sort(sortByReleaseDate);
         break;
       case sortType.DEFAULT:
-        this._filmData = [...this._filmDataSource];
+        this._filmData = this._moviesModel.movies;
         break;
       default:
         throw new Error(`Unhandled sort type ${selectedSort}`);
