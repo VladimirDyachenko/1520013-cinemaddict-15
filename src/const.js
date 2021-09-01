@@ -18,3 +18,9 @@ export const RankTrie = {
   20: 'Fan',
   21: 'Movie buff',
 };
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};

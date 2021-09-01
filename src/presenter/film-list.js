@@ -8,7 +8,7 @@ import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
 import { FilmControlAction, FILMS_PER_ROW } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
-import { sortType } from '../const.js';
+import { sortType, UpdateType } from '../const.js';
 
 export default class FilmList {
   constructor(listContainer, moviesModel) {
@@ -35,9 +35,12 @@ export default class FilmList {
     this._showMoreClickHandler = this._showMoreClickHandler.bind(this);
     this._filmControlClickHandler = this._filmControlClickHandler.bind(this);
     this._sortClickHandler = this._sortClickHandler.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
   }
 
   init() {
+    this._moviesModel.subscribe(this._handleModelEvent);
+
     this._renderMenu();
     this._renderSort();
     this._renderFilmList();
@@ -63,7 +66,7 @@ export default class FilmList {
     for(this._lastRenderedFilmCardIndex; this._lastRenderedFilmCardIndex < this._limit; this._lastRenderedFilmCardIndex++) {
       const filmData = this._filmData[this._lastRenderedFilmCardIndex];
       const filmCard = new FilmCardView(filmData);
-      filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.filmData));
+      filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.film));
       filmCard.setControlClickHandler(this._filmControlClickHandler);
 
       renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
@@ -78,7 +81,7 @@ export default class FilmList {
   }
 
   _clearFilmList() {
-    this._renderedCards.forEach((cardView) => cardView.removeElement());
+    this._renderedCards.forEach((cardView) => cardView.destroyElement());
     this._renderedCards.clear();
     this._limit = FILMS_PER_ROW;
     this._lastRenderedFilmCardIndex = 0;
@@ -130,6 +133,20 @@ export default class FilmList {
     this._renderFilmModal();
   }
 
+  _updateRenderedFilm(movieData) {
+    const filmCard = this._renderedCards.get(movieData.id);
+
+    if (filmCard) {
+      filmCard.film = movieData;
+      filmCard.updateElement();
+    }
+
+    if (this._filmModal !== null && this._filmModal.filmData.id === movieData.id) {
+      this._filmModal.filmData = movieData;
+      this._filmModal.updateElement();
+    }
+  }
+
   _closeFilmModal() {
     document.removeEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.destroyElement();
@@ -161,21 +178,7 @@ export default class FilmList {
         throw new Error(`Unhandled action: ${payload.action}`);
     }
 
-    this._moviesModel.updateMovie(payload.filmData);
-    this._filmData = this._moviesModel.movies;
-    this._sortedFilmData = this._moviesModel.getFiltredMovies();
-
-    const filmCard = this._renderedCards.get(payload.filmData.id);
-
-    if (filmCard) {
-      filmCard.filmData = payload.filmData;
-      filmCard.updateControl(payload.action);
-    }
-
-    if (this._filmModal !== null && this._filmModal.filmData.id === payload.filmData.id) {
-      this._filmModal.filmData = payload.filmData;
-      this._filmModal.updateControl(payload.action);
-    }
+    this._moviesModel.updateMovie(UpdateType.PATCH, payload.filmData);
   }
 
   _sortClickHandler(selectedSort) {
@@ -197,5 +200,21 @@ export default class FilmList {
     this._showMoreButton = new ShowMoreButtonView();
     this._renderShowMore();
     this._renderFilmCardsRow();
+  }
+
+  _handleModelEvent(updateType, data) {
+    // this._filmData = this._moviesModel.movies;
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._updateRenderedFilm(data);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  destroy() {
+    this._moviesModel.unsubscribe(this._handleModelEvent);
   }
 }
