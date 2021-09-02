@@ -24,3 +24,11 @@ export const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
 };
+
+export const Pages = {
+  All: '#all',
+  WATCHLIST: '#watchlist',
+  HISTORY: '#history',
+  FAVORITE: '#favorites',
+  STATISTIC: '#stats',
+};

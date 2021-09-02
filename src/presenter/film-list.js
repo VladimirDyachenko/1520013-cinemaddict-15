@@ -1,4 +1,3 @@
-import SiteMenuView from '../view/site-menu.js';
 import SortListView from '../view/films/sort.js';
 import FilmListView from '../view/films/films-list.js';
 import FilmCardView from '../view/films/film-card.js';
@@ -11,15 +10,15 @@ import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType, UpdateType } from '../const.js';
 
 export default class FilmList {
-  constructor(listContainer, moviesModel) {
+  constructor(listContainer, moviesModel, siteNavModel) {
     //Initial
     this._moviesModel = moviesModel;
+    this._siteNavModel = siteNavModel;
     this._listContainer = listContainer;
     this._filmData = this._moviesModel.movies;
     this._sortedFilmData = this._moviesModel.getFiltredMovies();
 
     //Views
-    this._siteMenu = new SiteMenuView(this._sortedFilmData);
     this._sortList = new SortListView();
     this._filmList = new FilmListView();
     this._showMoreButton = new ShowMoreButtonView();
@@ -41,16 +40,11 @@ export default class FilmList {
   init() {
     this._moviesModel.subscribe(this._handleModelEvent);
 
-    this._renderMenu();
     this._renderSort();
     this._renderFilmList();
     this._filmData.length > 0 ? this._renderFilmCardsRow() : this._filmList.showEmptyMessage();
     this._renderShowMore();
     this._renderFilmListExtra();
-  }
-
-  _renderMenu() {
-    renderElement(this._listContainer, this._siteMenu, InsertPosition.AFTER_BEGIN);
   }
 
   _renderSort() {
