@@ -32,3 +32,10 @@ export const Pages = {
   FAVORITE: '#favorites',
   STATISTIC: '#stats',
 };
+
+export const EmptyMessageByCurrentPage = {
+  [Pages.All]: 'There are no movies in our database',
+  [Pages.WATCHLIST]: 'There are no movies to watch now',
+  [Pages.HISTORY]: 'There are no watched movies now',
+  [Pages.FAVORITE]: 'There are no favorite movies now',
+};

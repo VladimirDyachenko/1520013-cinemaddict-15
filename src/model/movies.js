@@ -56,6 +56,6 @@ export default class MoviesModel extends AbstractSubscriber {
   }
 
   getFiltredMovies() {
-    return { ...this._filtredMovies };
+    return {...this._filtredMovies };
   }
 }
