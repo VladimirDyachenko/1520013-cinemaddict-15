@@ -5,7 +5,7 @@ import ShowMoreButtonView from '../view/films/show-more-button.js';
 import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
-import { FilmControlAction, FILMS_PER_ROW, Pages } from '../const.js';
+import { FilmControlAction, FILMS_PER_ROW, Pages, UserAction } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType, UpdateType } from '../const.js';
 
@@ -29,9 +29,9 @@ export default class FilmList {
     //Event handlers
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
     this._showMoreClickHandler = this._showMoreClickHandler.bind(this);
-    this._filmControlClickHandler = this._filmControlClickHandler.bind(this);
     this._sortClickHandler = this._sortClickHandler.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
   }
 
   init() {
@@ -97,9 +97,9 @@ export default class FilmList {
   }
 
   _renderFilmCard(film) {
-    const filmCard = new FilmCardView(film);
+    const filmCard = new FilmCardView(film, this._handleViewAction);
     filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.film));
-    filmCard.setControlClickHandler(this._filmControlClickHandler);
+    filmCard.setControlClickHandler(this._handleViewAction);
     this._renderedCards.set(film.id, filmCard);
     renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
   }
@@ -185,7 +185,7 @@ export default class FilmList {
     this._filmModal = new FilmModalView(filmData);
     document.addEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
-    this._filmModal.setControlClickHandler(this._filmControlClickHandler);
+    this._filmModal.setControlClickHandler(this._handleViewAction);
     this._renderFilmModal();
   }
 
@@ -260,6 +260,25 @@ export default class FilmList {
     this._renderShowMore();
   }
 
+  /**
+   * @param {UserAction} userAction
+   * @param {{}} update
+   */
+  _handleViewAction(userAction, update) {
+    switch (userAction) {
+      case UserAction.UPDATE_FILM:
+        this._filmControlClickHandler(update);
+        break;
+      case UserAction.ADD_COMMENT:
+        break;
+      case UserAction.DELETE_COMMENT:
+
+        break;
+      default:
+        throw new Error(`Unhandled view action ${userAction}`);
+    }
+  }
+
   _handleModelEvent(updateType, data) {
     this._filmData = this._getFilms();
     switch (updateType) {
@@ -282,5 +301,6 @@ export default class FilmList {
 
   destroy() {
     this._moviesModel.unsubscribe(this._handleModelEvent);
+    this._siteNavModel.unsubscribe(this._handleModelEvent);
   }
 }

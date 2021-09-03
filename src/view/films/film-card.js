@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 import SmartView from '../smart-view.js';
-import { FilmControlAction } from '../../const.js';
+import { FilmControlAction, UserAction } from '../../const.js';
 
 const getFilmCardTemplate = (film) => {
   const MAX_DESCRIPTION_LENGTH = 140;
@@ -84,7 +84,7 @@ export default class FilmCard extends SmartView {
     } else if (classList.contains(this._controlFavoriteClass)) {
       data.action = FilmControlAction.favorite;
     }
-    this._callbacks.controlClick(data);
+    this._callbacks.controlClick(UserAction.UPDATE_FILM, data);
   }
 
   setOpenModalHandler(callback) {

@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 import { getCommentsTemplate } from './comment.js';
 import SmartView from '../smart-view.js';
-import { FilmControlAction } from '../../const.js';
+import { FilmControlAction, UserAction } from '../../const.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
@@ -221,7 +221,7 @@ export default class FilmModal extends SmartView {
     } else if (classList.contains(this._controlFavoriteClass)) {
       data.action = FilmControlAction.favorite;
     }
-    this._callbacks.controlClick(data);
+    this._callbacks.controlClick(UserAction.UPDATE_FILM, data);
   }
 
   setControlClickHandler(callback) {
