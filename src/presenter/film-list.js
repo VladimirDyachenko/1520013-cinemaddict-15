@@ -187,6 +187,7 @@ export default class FilmList {
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
     this._filmModal.setControlClickHandler(this._handleViewAction);
     this._filmModal.setAddCommentHandler(this._handleViewAction);
+    this._filmModal.setDeleteCommentHandler(this._handleViewAction);
     this._renderFilmModal();
   }
 
@@ -274,7 +275,7 @@ export default class FilmList {
         this._moviesModel.addComment(UpdateType.PATCH, update);
         break;
       case UserAction.DELETE_COMMENT:
-
+        this._moviesModel.deleteComment(UpdateType.PATCH, update);
         break;
       default:
         throw new Error(`Unhandled view action ${userAction}`);

@@ -14,7 +14,7 @@ const getCommentTemplate = (comment) => {
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
         <span class="film-details__comment-day">${dateString}</span>
-        <button class="film-details__comment-delete">Delete</button>
+        <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
       </p>
     </div>
   </li>`;

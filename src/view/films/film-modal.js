@@ -176,6 +176,7 @@ export default class FilmModal extends SmartView {
     this._emojiPickHandler = this._emojiPickHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
     this._addCommentHandler = this._addCommentHandler.bind(this);
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
     this._controlActiveClass = 'film-details__control-button--active';
     this._controlWatchlistClass = 'film-details__control-button--watchlist';
     this._controlWatchedClass = 'film-details__control-button--watched';
@@ -238,6 +239,15 @@ export default class FilmModal extends SmartView {
     this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
   }
 
+  _deleteCommentHandler(event) {
+    event.preventDefault();
+
+    const commentId = event.target.dataset.id;
+    const movieId = this._data.id;
+
+    this._callbacks.deleteComment(UserAction.DELETE_COMMENT, { movieId,  commentId});
+  }
+
   setControlClickHandler(callback) {
     this._callbacks.controlClick = callback;
     this._controlButtons = [...this.getElement().querySelectorAll('.film-details__control-button')];
@@ -249,6 +259,15 @@ export default class FilmModal extends SmartView {
   setAddCommentHandler(callback) {
     this._callbacks.addComment = callback;
     window.addEventListener('keypress' , this._addCommentHandler);
+  }
+
+  setDeleteCommentHandler(callback) {
+    this._callbacks.deleteComment = callback;
+
+    const commentDeleteButtons = this.getElement().querySelectorAll('.film-details__comment-delete');
+    [...commentDeleteButtons].forEach((element) => {
+      element.addEventListener('click', this._deleteCommentHandler);
+    });
   }
 
   updateControl(action) {
@@ -298,6 +317,7 @@ export default class FilmModal extends SmartView {
     this.setCloseButtonClick(this._callbacks.closeButtonClick);
     this.setControlClickHandler(this._callbacks.controlClick);
     this.setAddCommentHandler(this._callbacks.addComment);
+    this.setDeleteCommentHandler(this._callbacks.deleteComment);
   }
 
   destroyElement() {
