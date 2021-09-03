@@ -175,6 +175,7 @@ export default class FilmModal extends SmartView {
     this._controlClickHandler = this._controlClickHandler.bind(this);
     this._emojiPickHandler = this._emojiPickHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._addCommentHandler = this._addCommentHandler.bind(this);
     this._controlActiveClass = 'film-details__control-button--active';
     this._controlWatchlistClass = 'film-details__control-button--watchlist';
     this._controlWatchedClass = 'film-details__control-button--watched';
@@ -224,12 +225,30 @@ export default class FilmModal extends SmartView {
     this._callbacks.controlClick(UserAction.UPDATE_FILM, data);
   }
 
+  _addCommentHandler(event) {
+    // Enter становиться \n при нажатом ctrl
+    if(!event.ctrlKey || event.key !== '\n') {
+      return;
+    }
+
+    const commentText = this.getElement().querySelector('.film-details__comment-input').value;
+    const selectedEmoji = this.getElement().querySelector('.film-details__emoji-item:checked').value;
+    const movieId = this._data.id;
+
+    this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
+  }
+
   setControlClickHandler(callback) {
     this._callbacks.controlClick = callback;
     this._controlButtons = [...this.getElement().querySelectorAll('.film-details__control-button')];
     this._controlButtons.forEach((button) => {
       button.addEventListener('click', this._controlClickHandler);
     });
+  }
+
+  setAddCommentHandler(callback) {
+    this._callbacks.addComment = callback;
+    window.addEventListener('keypress' , this._addCommentHandler);
   }
 
   updateControl(action) {
@@ -278,6 +297,7 @@ export default class FilmModal extends SmartView {
     this._setInnerHandlers();
     this.setCloseButtonClick(this._callbacks.closeButtonClick);
     this.setControlClickHandler(this._callbacks.controlClick);
+    this.setAddCommentHandler(this._callbacks.addComment);
   }
 
   destroyElement() {
@@ -287,6 +307,7 @@ export default class FilmModal extends SmartView {
     });
     this._element.remove();
     this._element = null;
+    window.removeEventListener('keypress', this._addCommentHandler);
     document.body.classList.remove('hide-overflow');
   }
 

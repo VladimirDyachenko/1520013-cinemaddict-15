@@ -186,6 +186,7 @@ export default class FilmList {
     document.addEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
     this._filmModal.setControlClickHandler(this._handleViewAction);
+    this._filmModal.setAddCommentHandler(this._handleViewAction);
     this._renderFilmModal();
   }
 
@@ -270,6 +271,7 @@ export default class FilmList {
         this._filmControlClickHandler(update);
         break;
       case UserAction.ADD_COMMENT:
+        this._moviesModel.addComment(UpdateType.PATCH, update);
         break;
       case UserAction.DELETE_COMMENT:
 

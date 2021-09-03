@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import AbstractSubscriber from './abstract-observer.js';
 
 export default class MoviesModel extends AbstractSubscriber {
@@ -57,5 +58,18 @@ export default class MoviesModel extends AbstractSubscriber {
 
   getFiltredMovies() {
     return {...this._filtredMovies };
+  }
+
+  addComment(updateType, newComment) {
+    const show = this._movies.find((movie) => movie.id === newComment.movieId);
+
+    show.comments.push({
+      emote: newComment.selectedEmoji,
+      text: newComment.commentText,
+      date: dayjs().toString(),
+      author: 'Jon Doe',
+    });
+
+    this.updateMovie(updateType, show);
   }
 }
