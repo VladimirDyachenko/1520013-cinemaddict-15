@@ -1,3 +1,4 @@
+import he from 'he';
 import dayjs from 'dayjs';
 import * as relativeTimePlugin from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTimePlugin);
@@ -10,7 +11,7 @@ const getCommentTemplate = (comment) => {
       <img src="./images/emoji/${comment.emote}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment.text}</p>
+      <p class="film-details__comment-text">${he.encode(comment.text)}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
         <span class="film-details__comment-day">${dateString}</span>
