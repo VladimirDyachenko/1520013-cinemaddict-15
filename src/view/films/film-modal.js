@@ -232,9 +232,21 @@ export default class FilmModal extends SmartView {
       return;
     }
 
-    const commentText = this.getElement().querySelector('.film-details__comment-input').value;
-    const selectedEmoji = this.getElement().querySelector('.film-details__emoji-item:checked').value;
+    const commentInput = this.getElement().querySelector('.film-details__comment-input');
+    const emojiInput = this.getElement().querySelector('.film-details__emoji-item:checked');
+
+    if (!emojiInput) {
+      return;
+    }
+
+    const commentText = commentInput.value;
+
+    if (commentText.length < 1) {
+      return;
+    }
+
     const movieId = this._data.id;
+    const selectedEmoji = emojiInput.value;
 
     this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
   }
