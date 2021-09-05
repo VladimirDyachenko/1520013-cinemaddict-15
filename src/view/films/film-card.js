@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
-import AbstractView from '../abstract-view.js';
-import { FilmControlAction } from '../../const.js';
+import SmartView from '../smart-view.js';
+import { FilmControlAction, UserAction } from '../../const.js';
 
 const getFilmCardTemplate = (film) => {
   const MAX_DESCRIPTION_LENGTH = 140;
@@ -14,10 +14,11 @@ const getFilmCardTemplate = (film) => {
     poster,
     description,
     comments,
-    watchlist,
-    alreadyWatched,
-    favorite,
+    isWatchlist,
+    isAlreadyWatched,
+    isFavorite,
   } = film;
+
   const year = dayjs(release.date).get('year').toString();
   const duration = getRuntimeString(runtime);
 
@@ -38,17 +39,17 @@ const getFilmCardTemplate = (film) => {
     <p class="film-card__description">${shortDescription}</p>
     <a class="film-card__comments">${comments.length} comments</a>
     <div class="film-card__controls">
-      <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlist ? controlActiveClass : ''}" type="button">Add to watchlist</button>
-      <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${alreadyWatched ? controlActiveClass : ''}" type="button">Mark as watched</button>
-      <button class="film-card__controls-item film-card__controls-item--favorite ${favorite ? controlActiveClass : ''}" type="button">Mark as favorite</button>
+      <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${isWatchlist ? controlActiveClass : ''}" type="button">Add to watchlist</button>
+      <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${isAlreadyWatched ? controlActiveClass : ''}" type="button">Mark as watched</button>
+      <button class="film-card__controls-item film-card__controls-item--favorite ${isFavorite ? controlActiveClass : ''}" type="button">Mark as favorite</button>
     </div>
   </article>`;
 };
 
-export default class FilmCard extends AbstractView {
+export default class FilmCard extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._data = FilmCard.parseFilmToData(film);
     this._openModalHandler = this._openModalHandler.bind(this);
     this._controlClickHandler = this._controlClickHandler.bind(this);
     this._controlActiveClass = 'film-card__controls-item--active';
@@ -58,15 +59,15 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return getFilmCardTemplate(this._film);
+    return getFilmCardTemplate(this._data);
   }
 
-  get filmData() {
-    return this._film;
+  get film() {
+    return FilmCard.parseDataToFilm(this._data);
   }
 
-  set filmData(filmData) {
-    this._film = filmData;
+  set film(film) {
+    this._data = FilmCard.parseFilmToData(film);
   }
 
   _openModalHandler() {
@@ -74,7 +75,7 @@ export default class FilmCard extends AbstractView {
   }
 
   _controlClickHandler(event) {
-    const data = { action: undefined, filmData: this._film };
+    const data = { action: undefined, filmData: this.film };
     const classList = event.target.classList;
     if (classList.contains(this._controlWatchlistClass)) {
       data.action = FilmControlAction.watchlist;
@@ -83,7 +84,7 @@ export default class FilmCard extends AbstractView {
     } else if (classList.contains(this._controlFavoriteClass)) {
       data.action = FilmControlAction.favorite;
     }
-    this._callbacks.controlClick(data);
+    this._callbacks.controlClick(UserAction.UPDATE_FILM, data);
   }
 
   setOpenModalHandler(callback) {
@@ -122,7 +123,12 @@ export default class FilmCard extends AbstractView {
     button.classList.toggle(this._controlActiveClass);
   }
 
-  removeElement() {
+  restoreHandlers() {
+    this.setOpenModalHandler(this._callbacks.openModalClick);
+    this.setControlClickHandler(this._callbacks.controlClick);
+  }
+
+  destroyElement() {
     this._element.removeEventListener('click', this._openModalHandler);
     this._controlButtons.forEach((button) => {
       button.removeEventListener('click', this._controlClickHandler);
@@ -130,4 +136,27 @@ export default class FilmCard extends AbstractView {
     this._element.remove();
     this._element = null;
   }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+      {},
+      film,
+      {
+        isWatchlist: film.watchlist,
+        isAlreadyWatched: film.alreadyWatched,
+        isFavorite: film.favorite,
+      },
+    );
+  }
+
+  static parseDataToFilm(data) {
+    data = Object.assign({}, data);
+
+    delete data.isWatchlist;
+    delete data.isAlreadyWatched;
+    delete data.isFavorite;
+
+    return data;
+  }
+
 }

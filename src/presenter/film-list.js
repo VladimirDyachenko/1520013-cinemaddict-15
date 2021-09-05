@@ -1,4 +1,3 @@
-import SiteMenuView from '../view/site-menu.js';
 import SortListView from '../view/films/sort.js';
 import FilmListView from '../view/films/films-list.js';
 import FilmCardView from '../view/films/film-card.js';
@@ -6,49 +5,86 @@ import ShowMoreButtonView from '../view/films/show-more-button.js';
 import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
 import { renderElement, InsertPosition } from '../utils/dom.js';
-import { updateFilm } from '../mock/films.js';
-import { FilmControlAction, FILMS_PER_ROW } from '../const.js';
+import { FilmControlAction, FILMS_PER_ROW, Pages, UserAction } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
-import { sortType } from '../const.js';
+import { sortType, UpdateType } from '../const.js';
 
 export default class FilmList {
-  constructor(listContainer, filmData, sortedFilmData) {
+  constructor(listContainer, moviesModel, siteNavModel) {
     //Initial
+    this._moviesModel = moviesModel;
+    this._siteNavModel = siteNavModel;
     this._listContainer = listContainer;
-    this._filmDataSource = filmData;
-    this._filmData = [...this._filmDataSource];
-    this._sortedFilmData = sortedFilmData;
 
     //Views
-    this._siteMenu = new SiteMenuView(this._sortedFilmData);
     this._sortList = new SortListView();
     this._filmList = new FilmListView();
     this._showMoreButton = new ShowMoreButtonView();
     this._filmModal = null;
 
     //Other
-    this._lastRenderedFilmCardIndex = 0;
-    this._limit = FILMS_PER_ROW;
+    this._renderedFilmCardsCount = FILMS_PER_ROW;
     this._renderedCards = new Map();
 
     //Event handlers
     this._onEscKeyDownHandler = this._onEscKeyDownHandler.bind(this);
     this._showMoreClickHandler = this._showMoreClickHandler.bind(this);
-    this._filmControlClickHandler = this._filmControlClickHandler.bind(this);
     this._sortClickHandler = this._sortClickHandler.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
   }
 
   init() {
-    this._renderMenu();
-    this._renderSort();
-    this._renderFilmList();
-    this._filmData.length > 0 ? this._renderFilmCardsRow() : this._filmList.showEmptyMessage();
-    this._renderShowMore();
-    this._renderFilmListExtra();
+    this._moviesModel.subscribe(this._handleModelEvent);
+    this._siteNavModel.subscribe(this._handleModelEvent);
+    this._filmData = this._getFilms();
+    this._renderPage();
   }
 
-  _renderMenu() {
-    renderElement(this._listContainer, this._siteMenu, InsertPosition.AFTER_BEGIN);
+  _getFilms() {
+    const activePage = this._siteNavModel.getActivePage();
+
+    if (activePage === Pages.STATISTIC) {
+      return;
+    }
+    let films;
+
+    switch (activePage) {
+      case Pages.All:
+        films = this._moviesModel.movies;
+        break;
+      case Pages.FAVORITE:
+        films = [...this._moviesModel.getFiltredMovies().favoriteList];
+        break;
+      case Pages.HISTORY:
+        films = [...this._moviesModel.getFiltredMovies().historyList];
+        break;
+      case Pages.WATCHLIST:
+        films = [...this._moviesModel.getFiltredMovies().watchList];
+        break;
+      default:
+        throw new Error('Missing page');
+    }
+
+    return films;
+  }
+
+  _renderPage() {
+    if (!this._filmData) {
+      return;
+    }
+
+    this._renderSort();
+    this._renderFilmList();
+
+    if (this._filmData.length > 0) {
+      this._renderFilmCards(this._filmData.slice(0, Math.min(this._filmData.length, this._renderedFilmCardsCount)));
+      this._renderShowMore();
+    } else {
+      this._renderNoFilms();
+    }
+
+    this._renderFilmListExtra();
   }
 
   _renderSort() {
@@ -60,33 +96,41 @@ export default class FilmList {
     renderElement(this._listContainer, this._filmList, InsertPosition.BEFORE_END);
   }
 
-  _renderFilmCardsRow() {
-    for(this._lastRenderedFilmCardIndex; this._lastRenderedFilmCardIndex < this._limit; this._lastRenderedFilmCardIndex++) {
-      const filmData = this._filmData[this._lastRenderedFilmCardIndex];
-      const filmCard = new FilmCardView(filmData);
-      filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.filmData));
-      filmCard.setControlClickHandler(this._filmControlClickHandler);
-
-      renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
-      this._renderedCards.set(filmData.id, filmCard);
-    }
-
-    this._limit = this._lastRenderedFilmCardIndex + FILMS_PER_ROW < this._filmData.length ?
-      this._lastRenderedFilmCardIndex + FILMS_PER_ROW :
-      this._filmData.length;
-
-    return this._filmData.length - this._lastRenderedFilmCardIndex;
+  _renderFilmCard(film) {
+    const filmCard = new FilmCardView(film, this._handleViewAction);
+    filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.film));
+    filmCard.setControlClickHandler(this._handleViewAction);
+    this._renderedCards.set(film.id, filmCard);
+    renderElement(this._filmList.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
   }
 
-  _clearFilmList() {
-    this._renderedCards.forEach((cardView) => cardView.removeElement());
+  _renderFilmCards(films) {
+    films.forEach((film) => this._renderFilmCard(film));
+  }
+
+  _renderNoFilms() {
+    this._filmList.showEmptyMessage(this._siteNavModel.getActivePage());
+  }
+
+  _clearFilmList(resetRenderedCardsCount) {
+    this._renderedCards.forEach((cardView) => cardView.destroyElement());
     this._renderedCards.clear();
-    this._limit = FILMS_PER_ROW;
-    this._lastRenderedFilmCardIndex = 0;
+    if (resetRenderedCardsCount) {
+      this._renderedFilmCardsCount = FILMS_PER_ROW;
+    } else {
+      this._renderedFilmCardsCount = Math.min(this._filmData.length, this._renderedFilmCardsCount);
+    }
     this._removeShowMoreButton();
   }
 
   _renderShowMore() {
+    if (this._filmData.length <= this._renderedFilmCardsCount) {
+      return;
+    }
+
+    if (this._showMoreButton === null) {
+      this._showMoreButton = new ShowMoreButtonView();
+    }
     renderElement(this._filmList.getFilmSection(), this._showMoreButton, InsertPosition.BEFORE_END);
     this._showMoreButton.setClickHandler(this._showMoreClickHandler);
   }
@@ -100,9 +144,23 @@ export default class FilmList {
     renderElement(document.body, this._filmModal, InsertPosition.BEFORE_END);
   }
 
+  _clearPage({ resetRenderedCardsCount = false } = {}) {
+    this._sortList.getElement().remove();
+    this._sortList.removeElement();
+    this._clearFilmList(resetRenderedCardsCount);
+    this._filmList.getElement().remove();
+    this._filmList.removeElement();
+  }
+
   _showMoreClickHandler() {
-    const filmsLeft = this._renderFilmCardsRow();
-    if (filmsLeft === 0 ) {
+    const filmCount = this._filmData.length;
+    const newRenderFilmsCount = Math.min(filmCount, this._renderedFilmCardsCount + FILMS_PER_ROW);
+    const films = this._filmData.slice(this._renderedFilmCardsCount, newRenderFilmsCount);
+    this._renderFilmCards(films);
+
+    this._renderedFilmCardsCount = newRenderFilmsCount;
+
+    if (this._renderedFilmCardsCount >= filmCount) {
       this._removeShowMoreButton();
     }
   }
@@ -127,8 +185,26 @@ export default class FilmList {
     this._filmModal = new FilmModalView(filmData);
     document.addEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
-    this._filmModal.setControlClickHandler(this._filmControlClickHandler);
+    this._filmModal.setControlClickHandler(this._handleViewAction);
+    this._filmModal.setAddCommentHandler(this._handleViewAction);
+    this._filmModal.setDeleteCommentHandler(this._handleViewAction);
     this._renderFilmModal();
+  }
+
+  _updateRenderedFilmCard(filmData) {
+    const filmCard = this._renderedCards.get(filmData.id);
+
+    if (filmCard) {
+      filmCard.film = filmData;
+      filmCard.updateElement();
+    }
+  }
+
+  _updateFilmModal(filmData) {
+    if (this._filmModal !== null && this._filmModal.filmData.id === filmData.id) {
+      this._filmModal.filmData = filmData;
+      this._filmModal.updateElement();
+    }
   }
 
   _closeFilmModal() {
@@ -162,19 +238,7 @@ export default class FilmList {
         throw new Error(`Unhandled action: ${payload.action}`);
     }
 
-    this._filmData = updateFilm(this._filmData, payload.filmData);
-
-    const filmCard = this._renderedCards.get(payload.filmData.id);
-
-    if (filmCard) {
-      filmCard.filmData = payload.filmData;
-      filmCard.updateControl(payload.action);
-    }
-
-    if (this._filmModal !== null && this._filmModal.filmData.id === payload.filmData.id) {
-      this._filmModal.filmData = payload.filmData;
-      this._filmModal.updateControl(payload.action);
-    }
+    this._moviesModel.updateMovie(UpdateType.MINOR, payload.filmData);
   }
 
   _sortClickHandler(selectedSort) {
@@ -186,15 +250,60 @@ export default class FilmList {
         this._filmData.sort(sortByReleaseDate);
         break;
       case sortType.DEFAULT:
-        this._filmData = [...this._filmDataSource];
+        this._filmData = this._getFilms();
         break;
       default:
         throw new Error(`Unhandled sort type ${selectedSort}`);
     }
 
     this._clearFilmList();
+    this._renderFilmCards(this._filmData.slice(0, this._renderedFilmCardsCount));
     this._showMoreButton = new ShowMoreButtonView();
     this._renderShowMore();
-    this._renderFilmCardsRow();
+  }
+
+  /**
+   * @param {UserAction} userAction
+   * @param {{}} update
+   */
+  _handleViewAction(userAction, update) {
+    switch (userAction) {
+      case UserAction.UPDATE_FILM:
+        this._filmControlClickHandler(update);
+        break;
+      case UserAction.ADD_COMMENT:
+        this._moviesModel.addComment(UpdateType.PATCH, update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._moviesModel.deleteComment(UpdateType.PATCH, update);
+        break;
+      default:
+        throw new Error(`Unhandled view action ${userAction}`);
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    this._filmData = this._getFilms();
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._updateRenderedFilmCard(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearPage();
+        this._renderPage();
+        break;
+      case UpdateType.MAJOR:
+        this._clearPage({ resetRenderedCardsCount: true });
+        this._renderPage();
+        break;
+      default:
+        throw new Error(`Unhandled updateType ${updateType}`);
+    }
+    this._updateFilmModal(data);
+  }
+
+  destroy() {
+    this._moviesModel.unsubscribe(this._handleModelEvent);
+    this._siteNavModel.unsubscribe(this._handleModelEvent);
   }
 }

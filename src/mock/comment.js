@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import {
   getRandomPositiveFloat,
   getRandomPositiveInteger,
@@ -22,5 +23,6 @@ export const generateComment = () => (
     date: getRandomDate(),
     author: getAuthor(),
     text: getText(),
+    id: nanoid(),
   }
 );

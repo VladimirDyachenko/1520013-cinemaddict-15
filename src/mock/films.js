@@ -115,49 +115,8 @@ const generateFilm = () => {
   };
 };
 
-const getFilterData = (filmList) => {
-  const watchList = [];
-  const historyList = [];
-  const favoriteList = [];
-
-  filmList.forEach((film) => {
-    if (film.watchlist) {
-      watchList.push(film);
-    }
-
-    if (film.alreadyWatched) {
-      historyList.push(film);
-    }
-
-    if (film.favorite) {
-      favoriteList.push(film);
-    }
-  });
-
-  return {
-    watchList,
-    historyList,
-    favoriteList,
-  };
-};
-
 export const getTestData = (amount = 20) => {
   const films = new Array(amount).fill().map(() => generateFilm());
-  const filterData = getFilterData(films);
 
-  return [films, filterData];
-};
-
-export const updateFilm = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
+  return films;
 };

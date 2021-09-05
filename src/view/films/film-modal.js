@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { getRuntimeString } from '../../utils/utils.js';
 import { getCommentsTemplate } from './comment.js';
 import SmartView from '../smart-view.js';
-import { FilmControlAction } from '../../const.js';
+import { FilmControlAction, UserAction } from '../../const.js';
 
 const getFilmModalTemplate = (filmData) => {
   const {
@@ -175,6 +175,8 @@ export default class FilmModal extends SmartView {
     this._controlClickHandler = this._controlClickHandler.bind(this);
     this._emojiPickHandler = this._emojiPickHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._addCommentHandler = this._addCommentHandler.bind(this);
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
     this._controlActiveClass = 'film-details__control-button--active';
     this._controlWatchlistClass = 'film-details__control-button--watchlist';
     this._controlWatchedClass = 'film-details__control-button--watched';
@@ -221,7 +223,41 @@ export default class FilmModal extends SmartView {
     } else if (classList.contains(this._controlFavoriteClass)) {
       data.action = FilmControlAction.favorite;
     }
-    this._callbacks.controlClick(data);
+    this._callbacks.controlClick(UserAction.UPDATE_FILM, data);
+  }
+
+  _addCommentHandler(event) {
+    // Enter становиться \n при нажатом ctrl
+    if(!event.ctrlKey || event.key !== '\n') {
+      return;
+    }
+
+    const commentInput = this.getElement().querySelector('.film-details__comment-input');
+    const emojiInput = this.getElement().querySelector('.film-details__emoji-item:checked');
+
+    if (!emojiInput) {
+      return;
+    }
+
+    const commentText = commentInput.value;
+
+    if (commentText.length < 1) {
+      return;
+    }
+
+    const movieId = this._data.id;
+    const selectedEmoji = emojiInput.value;
+
+    this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
+  }
+
+  _deleteCommentHandler(event) {
+    event.preventDefault();
+
+    const commentId = event.target.dataset.id;
+    const movieId = this._data.id;
+
+    this._callbacks.deleteComment(UserAction.DELETE_COMMENT, { movieId,  commentId});
   }
 
   setControlClickHandler(callback) {
@@ -229,6 +265,20 @@ export default class FilmModal extends SmartView {
     this._controlButtons = [...this.getElement().querySelectorAll('.film-details__control-button')];
     this._controlButtons.forEach((button) => {
       button.addEventListener('click', this._controlClickHandler);
+    });
+  }
+
+  setAddCommentHandler(callback) {
+    this._callbacks.addComment = callback;
+    window.addEventListener('keypress' , this._addCommentHandler);
+  }
+
+  setDeleteCommentHandler(callback) {
+    this._callbacks.deleteComment = callback;
+
+    const commentDeleteButtons = this.getElement().querySelectorAll('.film-details__comment-delete');
+    [...commentDeleteButtons].forEach((element) => {
+      element.addEventListener('click', this._deleteCommentHandler);
     });
   }
 
@@ -278,6 +328,8 @@ export default class FilmModal extends SmartView {
     this._setInnerHandlers();
     this.setCloseButtonClick(this._callbacks.closeButtonClick);
     this.setControlClickHandler(this._callbacks.controlClick);
+    this.setAddCommentHandler(this._callbacks.addComment);
+    this.setDeleteCommentHandler(this._callbacks.deleteComment);
   }
 
   destroyElement() {
@@ -287,6 +339,7 @@ export default class FilmModal extends SmartView {
     });
     this._element.remove();
     this._element = null;
+    window.removeEventListener('keypress', this._addCommentHandler);
     document.body.classList.remove('hide-overflow');
   }
 

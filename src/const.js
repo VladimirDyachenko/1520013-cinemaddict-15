@@ -18,3 +18,30 @@ export const RankTrie = {
   20: 'Fan',
   21: 'Movie buff',
 };
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export const Pages = {
+  All: '#all',
+  WATCHLIST: '#watchlist',
+  HISTORY: '#history',
+  FAVORITE: '#favorites',
+  STATISTIC: '#stats',
+};
+
+export const EmptyMessageByCurrentPage = {
+  [Pages.All]: 'There are no movies in our database',
+  [Pages.WATCHLIST]: 'There are no movies to watch now',
+  [Pages.HISTORY]: 'There are no watched movies now',
+  [Pages.FAVORITE]: 'There are no favorite movies now',
+};
+
+export const UserAction = {
+  UPDATE_FILM: 'UPDATE_FILM',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};

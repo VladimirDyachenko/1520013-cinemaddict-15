@@ -1,7 +1,6 @@
+import { EmptyMessageByCurrentPage } from '../../const';
 import { createElement } from '../../utils/dom';
 import AbstractView from '../abstract-view.js';
-
-const DEFAULT_EMPTY_MESSAGE = 'There are no movies in our database';
 
 const getFilmsListTemplate = () => (
   `<section class="films">
@@ -45,7 +44,9 @@ export default class FilmList extends AbstractView {
     return this._filmListContainer;
   }
 
-  showEmptyMessage(message = DEFAULT_EMPTY_MESSAGE) {
+  showEmptyMessage(activePage) {
+    const message = EmptyMessageByCurrentPage[activePage];
+
     this._filmListContainer.remove();
     this._filmListTitle.textContent = message;
     this._filmListTitle.classList.remove('visually-hidden');
