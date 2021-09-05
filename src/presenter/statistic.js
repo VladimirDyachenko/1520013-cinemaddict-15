@@ -7,17 +7,23 @@ export default class Statistic {
 
     this._moviesModel = moviesModel;
     this._siteNavModel = siteNavModel;
-
-    this._films = this._moviesModel.movies;
-    this._filmsFilterData = this._moviesModel.getFiltredMovies();
-    this._statisticView = new StatisticView(this._films);
   }
 
   init() {
+    this._films = this._moviesModel.movies;
+    this._filmsFilterData = this._moviesModel.getFiltredMovies();
+    this._statisticView = new StatisticView(this._films);
     this._renderStatistic();
   }
 
   _renderStatistic() {
     renderElement(this._containerElement, this._statisticView, InsertPosition.BEFORE_END);
+  }
+
+  destroy() {
+    if (this._statisticView) {
+      this._statisticView.getElement().remove();
+      this._statisticView.removeElement();
+    }
   }
 }

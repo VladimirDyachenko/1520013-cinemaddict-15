@@ -21,16 +21,14 @@ const movieListPresenter = new FilmListPresenter(mainElement, moviesModel, siteN
 
 sharedPresentor.init();
 
-const renderStatsPage = () => {
-  siteNavModel.setActivePage(UpdateType.MAJOR, Pages.STATISTIC);
-  staticPagePresentor.init();
-};
+siteNavModel.subscribe((_, newPage) => {
+  if (newPage === Pages.STATISTIC) {
+    movieListPresenter.destroy();
+    staticPagePresentor.init();
+  } else {
+    staticPagePresentor.destroy();
+    movieListPresenter.init();
+  }
+});
 
-const renderMainPage = () => {
-  siteNavModel.setActivePage(UpdateType.MAJOR, Pages.All);
-  movieListPresenter.init();
-};
-
-const setPage = (isStatPage = false) => isStatPage ? renderStatsPage() : renderMainPage();
-
-setPage();
+siteNavModel.setActivePage(UpdateType.MAJOR, Pages.All);

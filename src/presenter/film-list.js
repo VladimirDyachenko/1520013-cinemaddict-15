@@ -305,5 +305,15 @@ export default class FilmList {
   destroy() {
     this._moviesModel.unsubscribe(this._handleModelEvent);
     this._siteNavModel.unsubscribe(this._handleModelEvent);
+
+    if (this._sortList) {
+      this._sortList.getElement().remove();
+      this._sortList.removeElement();
+    }
+
+    if (this._filmList) {
+      this._filmList.getElement().remove();
+      this._filmList.removeElement();
+    }
   }
 }
