@@ -16,7 +16,7 @@ moviesModel.movies = films;
 const siteNavModel = new SiteNavModel();
 
 const sharedPresentor = new SharedPresentor(mainElement, filmsCount, moviesModel, siteNavModel);
-const staticPagePresentor = new StatisticPresentor(mainElement, moviesModel, siteNavModel);
+const statisticPagePresentor = new StatisticPresentor(mainElement, moviesModel);
 const movieListPresenter = new FilmListPresenter(mainElement, moviesModel, siteNavModel);
 
 sharedPresentor.init();
@@ -24,9 +24,9 @@ sharedPresentor.init();
 siteNavModel.subscribe((_, newPage) => {
   if (newPage === Pages.STATISTIC) {
     movieListPresenter.destroy();
-    staticPagePresentor.init();
+    statisticPagePresentor.init();
   } else {
-    staticPagePresentor.destroy();
+    statisticPagePresentor.destroy();
     movieListPresenter.init();
   }
 });
