@@ -1,3 +1,5 @@
+import MoviesModel from './model/movies.js';
+
 const Method = {
   GET: 'GET',
   POST: 'POST',
@@ -19,7 +21,8 @@ export default class RestService {
 
   getMovies() {
     return this._load({url: 'movies'})
-      .then(RestService.toJSON);
+      .then(RestService.toJSON)
+      .then((movies) => movies.map(MoviesModel.adaptToClient));
   }
 
   updateMovie(movie) {
@@ -29,7 +32,8 @@ export default class RestService {
       body: JSON.stringify(movie),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
-      .then(RestService.toJSON());
+      .then(RestService.toJSON)
+      .then(MoviesModel.adaptToClient);
   }
 
   _load({
