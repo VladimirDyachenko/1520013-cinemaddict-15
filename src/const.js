@@ -27,6 +27,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const Pages = {
@@ -42,6 +43,7 @@ export const EmptyMessageByCurrentPage = {
   [Pages.WATCHLIST]: 'There are no movies to watch now',
   [Pages.HISTORY]: 'There are no watched movies now',
   [Pages.FAVORITE]: 'There are no favorite movies now',
+  LOADING: 'Loading...',
 };
 
 export const UserAction = {

@@ -4,7 +4,7 @@ import { getCommentsTemplate } from './comment.js';
 import SmartView from '../smart-view.js';
 import { FilmControlAction, UserAction } from '../../const.js';
 
-const getFilmModalTemplate = (filmData) => {
+const getFilmModalTemplate = (filmData, comments) => {
   const {
     title,
     alternativeTitle,
@@ -18,7 +18,6 @@ const getFilmModalTemplate = (filmData) => {
     runtime,
     genre,
     description,
-    comments,
     isComments,
     isWatchlist,
     isAlreadyWatched,
@@ -168,7 +167,7 @@ const getFilmModalTemplate = (filmData) => {
 };
 
 export default class FilmModal extends SmartView {
-  constructor(data) {
+  constructor(data, comments) {
     super();
     this._data = FilmModal.parseFilmToData(data);
     this._closeModalHandler = this._closeModalHandler.bind(this);
@@ -181,6 +180,7 @@ export default class FilmModal extends SmartView {
     this._controlWatchlistClass = 'film-details__control-button--watchlist';
     this._controlWatchedClass = 'film-details__control-button--watched';
     this._controlFavoriteClass = 'film-details__control-button--favorite';
+    this._comments = comments;
 
     this.onInit();
   }
@@ -199,7 +199,7 @@ export default class FilmModal extends SmartView {
   }
 
   getTemplate() {
-    return getFilmModalTemplate(this._data);
+    return getFilmModalTemplate(this._data, this._comments);
   }
 
   _closeModalHandler() {

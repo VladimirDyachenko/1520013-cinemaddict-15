@@ -25,11 +25,17 @@ export default class RestService {
       .then((movies) => movies.map(MoviesModel.adaptToClient));
   }
 
+  getCommentsForMovie(movieId) {
+    return this._load({url: `comments/${movieId}`})
+      .then(RestService.toJSON)
+      .then((comments) => comments.map(MoviesModel.adaptCommentToClient));
+  }
+
   updateMovie(movie) {
     return this._load({
-      url: `/movies/${movie.id}`,
+      url: `movies/${movie.id}`,
       method: Method.PUT,
-      body: JSON.stringify(movie),
+      body: JSON.stringify(MoviesModel.adaptToServer(movie)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
       .then(RestService.toJSON)

@@ -40,6 +40,12 @@ export default class MoviesModel extends AbstractSubscriber {
     };
   }
 
+  setMovies(updateType, movies) {
+    this.movies = movies;
+
+    this._notify(updateType, [...this._movies]);
+  }
+
   get movies() {
     return [...this._movies];
   }
@@ -119,7 +125,13 @@ export default class MoviesModel extends AbstractSubscriber {
   }
 
   static adaptToServer(movie) {
-    const adaptedTask = {};
+    const adaptedTask = {
+      'film_info': {
+        'release': {},
+      },
+      'user_details': {},
+    };
+
     adaptedTask['id'] = movie.id;
     adaptedTask['comments'] = movie.comments;
     adaptedTask['film_info']['title'] = movie.title;
@@ -138,7 +150,24 @@ export default class MoviesModel extends AbstractSubscriber {
     adaptedTask['user_details']['watchlist'] = movie.watchlist;
     adaptedTask['user_details']['already_watched'] = movie.alreadyWatched;
     adaptedTask['user_details']['favorite'] = movie.favorite;
+    adaptedTask['user_details']['watching_date'] = movie.watchingDate;
 
     return adaptedTask;
+  }
+
+  static adaptCommentToClient(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        emote: comment['emotion'],
+        text: comment['comment'],
+      },
+    );
+
+    delete adaptedComment['emotion'];
+    delete adaptedComment['comment'];
+
+    return adaptedComment;
   }
 }
