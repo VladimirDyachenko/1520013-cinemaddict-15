@@ -5,7 +5,8 @@ import MoviesModel from './model/movies.js';
 import { getTestData } from './mock/films.js';
 import { getRandomPositiveInteger } from './utils/test-data.js';
 import SiteNavModel from './model/site-nav.js';
-import { Pages, UpdateType } from './const.js';
+import { END_POINT, AUTHORIZATION, Pages, UpdateType } from './const.js';
+import RestService from './rest-service.js';
 
 const films = getTestData();
 const mainElement = document.querySelector('.main');
@@ -32,3 +33,7 @@ siteNavModel.subscribe((_, newPage) => {
 });
 
 siteNavModel.setActivePage(UpdateType.MAJOR, Pages.All);
+
+const restService = new RestService(END_POINT, AUTHORIZATION);
+
+restService.getMovies().then((movies) => console.log(movies));

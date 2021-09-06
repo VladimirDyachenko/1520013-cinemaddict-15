@@ -1,3 +1,7 @@
+export const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
+
+export const AUTHORIZATION = 'Basic my_git_hub_password_qwerty';
+
 export const sortType = {
   DEFAULT: 'default',
   DATE: 'date',
