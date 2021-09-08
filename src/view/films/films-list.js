@@ -44,8 +44,13 @@ export default class FilmList extends AbstractView {
     return this._filmListContainer;
   }
 
-  showEmptyMessage(activePage) {
-    const message = EmptyMessageByCurrentPage[activePage];
+  showEmptyMessage(activePage, isLoading) {
+    let message = '';
+    if (isLoading) {
+      message = EmptyMessageByCurrentPage.LOADING;
+    } else {
+      message = EmptyMessageByCurrentPage[activePage];
+    }
 
     this._filmListContainer.remove();
     this._filmListTitle.textContent = message;

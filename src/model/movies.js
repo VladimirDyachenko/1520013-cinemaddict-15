@@ -5,7 +5,11 @@ export default class MoviesModel extends AbstractSubscriber {
   constructor() {
     super();
     this._movies = [];
-    this._filtredMovies = {};
+    this._filtredMovies = {
+      watchList: [],
+      historyList: [],
+      favoriteList: [],
+    };
   }
 
   set movies(movies) {
@@ -34,6 +38,12 @@ export default class MoviesModel extends AbstractSubscriber {
       historyList,
       favoriteList,
     };
+  }
+
+  setMovies(updateType, movies) {
+    this.movies = movies;
+
+    this._notify(updateType, [...this._movies]);
   }
 
   get movies() {
@@ -79,5 +89,85 @@ export default class MoviesModel extends AbstractSubscriber {
     show.comments = show.comments.filter((comment) => comment.id !== commentId);
 
     this.updateMovie(updateType, show);
+  }
+
+  static adaptToClient(movie) {
+    const adaptedTask = Object.assign(
+      {},
+      movie,
+      {
+        title: movie['film_info']['title'],
+        alternativeTitle: movie['film_info']['alternative_title'],
+        totalRating: movie['film_info']['total_rating'],
+        poster: movie['film_info']['poster'],
+        ageRating: movie['film_info']['age_rating'],
+        director: movie['film_info']['director'],
+        writers: movie['film_info']['writers'],
+        actors: movie['film_info']['actors'],
+        release: {
+          date: movie['film_info']['release']['date'],
+          country: movie['film_info']['release']['release_country'],
+        },
+        runtime: movie['film_info']['runtime'],
+        genre: movie['film_info']['genre'],
+        description: movie['film_info']['description'],
+        watchlist: movie['user_details']['watchlist'],
+        alreadyWatched: movie['user_details']['already_watched'],
+        watchingDate: movie['user_details']['watching_date'],
+        favorite: movie['user_details']['favorite'],
+      },
+    );
+
+    delete adaptedTask['film_info'];
+    delete adaptedTask['user_details'];
+
+    return adaptedTask;
+  }
+
+  static adaptToServer(movie) {
+    const adaptedTask = {
+      'film_info': {
+        'release': {},
+      },
+      'user_details': {},
+    };
+
+    adaptedTask['id'] = movie.id;
+    adaptedTask['comments'] = movie.comments;
+    adaptedTask['film_info']['title'] = movie.title;
+    adaptedTask['film_info']['alternative_title'] = movie.alternativeTitle;
+    adaptedTask['film_info']['total_rating'] = movie.totalRating;
+    adaptedTask['film_info']['poster'] = movie.poster;
+    adaptedTask['film_info']['age_rating'] = movie.ageRating;
+    adaptedTask['film_info']['director'] = movie.director;
+    adaptedTask['film_info']['writers'] = movie.writers;
+    adaptedTask['film_info']['actors'] = movie.actors;
+    adaptedTask['film_info']['release']['date'] = movie.release.date;
+    adaptedTask['film_info']['release']['release_country'] = movie.release.country;
+    adaptedTask['film_info']['runtime'] = movie.runtime;
+    adaptedTask['film_info']['genre'] = movie.genre;
+    adaptedTask['film_info']['description'] = movie.description;
+    adaptedTask['user_details']['watchlist'] = movie.watchlist;
+    adaptedTask['user_details']['already_watched'] = movie.alreadyWatched;
+    adaptedTask['user_details']['favorite'] = movie.favorite;
+    adaptedTask['user_details']['watching_date'] = movie.watchingDate;
+
+    return adaptedTask;
+  }
+
+  static adaptCommentToClient(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        emote: comment['emotion'],
+        text: comment['comment'],
+      },
+    );
+
+    delete adaptedComment['emotion'];
+    delete adaptedComment['comment'];
+
+    return adaptedComment;
   }
 }

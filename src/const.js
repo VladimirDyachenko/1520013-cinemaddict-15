@@ -1,3 +1,7 @@
+export const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
+
+export const AUTHORIZATION = 'Basic my_git_hub_password_qwerty';
+
 export const sortType = {
   DEFAULT: 'default',
   DATE: 'date',
@@ -23,6 +27,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const Pages = {
@@ -38,6 +43,7 @@ export const EmptyMessageByCurrentPage = {
   [Pages.WATCHLIST]: 'There are no movies to watch now',
   [Pages.HISTORY]: 'There are no watched movies now',
   [Pages.FAVORITE]: 'There are no favorite movies now',
+  LOADING: 'Loading...',
 };
 
 export const UserAction = {

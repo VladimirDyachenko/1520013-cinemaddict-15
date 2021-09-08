@@ -10,17 +10,19 @@ import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType, UpdateType } from '../const.js';
 
 export default class FilmList {
-  constructor(listContainer, moviesModel, siteNavModel) {
+  constructor(listContainer, moviesModel, siteNavModel, restService) {
     //Initial
     this._moviesModel = moviesModel;
     this._siteNavModel = siteNavModel;
     this._listContainer = listContainer;
+    this._isLoading = true;
 
     //Views
     this._sortList = new SortListView();
     this._filmList = new FilmListView();
     this._showMoreButton = new ShowMoreButtonView();
     this._filmModal = null;
+    this._restService = restService;
 
     //Other
     this._renderedFilmCardsCount = FILMS_PER_ROW;
@@ -109,7 +111,7 @@ export default class FilmList {
   }
 
   _renderNoFilms() {
-    this._filmList.showEmptyMessage(this._siteNavModel.getActivePage());
+    this._filmList.showEmptyMessage(this._siteNavModel.getActivePage(), this._isLoading);
   }
 
   _clearFilmList(resetRenderedCardsCount) {
@@ -173,16 +175,25 @@ export default class FilmList {
     }
   }
 
-  _openFilmModal(filmData) {
+  async _openFilmModal(filmData) {
+    let comments = [];
+    try {
+      comments = await this._restService.getCommentsForMovie(filmData.id);
+    } catch (error) {
+      comments = [];
+      //TODO отрисовать плашку, что комментарии не удалось загрузить
+    }
+
     if (this._filmModal !== null) {
       //Обновляем так чтобы при открытии нового модального окна
       //сбросить состояние формы комментария
-      this._filmModal.filmData = filmData;
-      this._filmModal.updateData({}, true);
-      return;
+      // this._filmModal.filmData = filmData;
+      // this._filmModal.updateData({}, true);
+      this._filmModal.destroyElement();
+      this._filmModal = null;
     }
 
-    this._filmModal = new FilmModalView(filmData);
+    this._filmModal = new FilmModalView(filmData, comments);
     document.addEventListener('keydown', this._onEscKeyDownHandler);
     this._filmModal.setCloseButtonClick(() => this._onModalCloseClick());
     this._filmModal.setControlClickHandler(this._handleViewAction);
@@ -230,6 +241,13 @@ export default class FilmList {
         break;
       case FilmControlAction.watched:
         payload.filmData.alreadyWatched = !payload.filmData.alreadyWatched;
+
+        if (payload.filmData.alreadyWatched) {
+          payload.filmData.watchingDate = new Date().toISOString();
+        } else {
+          payload.filmData.watchingDate = null;
+        }
+
         break;
       case FilmControlAction.favorite:
         payload.filmData.favorite = !payload.filmData.favorite;
@@ -238,7 +256,9 @@ export default class FilmList {
         throw new Error(`Unhandled action: ${payload.action}`);
     }
 
-    this._moviesModel.updateMovie(UpdateType.MINOR, payload.filmData);
+    this._restService.updateMovie(payload.filmData)
+      .then((response) => this._moviesModel.updateMovie(UpdateType.MINOR, response));
+
   }
 
   _sortClickHandler(selectedSort) {
@@ -293,6 +313,11 @@ export default class FilmList {
         this._renderPage();
         break;
       case UpdateType.MAJOR:
+        this._clearPage({ resetRenderedCardsCount: true });
+        this._renderPage();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
         this._clearPage({ resetRenderedCardsCount: true });
         this._renderPage();
         break;
