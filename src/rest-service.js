@@ -53,6 +53,13 @@ export default class RestService {
       .then((res) => MoviesModel.adaptToClient(res.movie));
   }
 
+  deleteComment(commentID) {
+    return this._load({
+      url: `comments/${commentID}`,
+      method:Method.DELETE,
+    });
+  }
+
   _load({
     url,
     method = Method.GET,

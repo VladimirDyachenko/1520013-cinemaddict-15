@@ -80,7 +80,7 @@ export default class MoviesModel extends AbstractSubscriber {
   deleteComment(updateType, { movieId, commentId }) {
     const show = this._movies.find((movie) => movie.id === movieId);
 
-    show.comments = show.comments.filter((comment) => comment.id !== commentId);
+    show.comments = show.comments.filter((comment) => comment !== commentId);
 
     this.updateMovie(updateType, show);
   }
