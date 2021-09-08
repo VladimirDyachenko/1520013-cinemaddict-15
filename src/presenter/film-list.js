@@ -292,7 +292,12 @@ export default class FilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._restService.addComment(update)
-          .then((movie) => this._moviesModel.addComment(UpdateType.PATCH, movie));
+          .then((movie) => this._moviesModel.addComment(UpdateType.PATCH, movie))
+          .catch(() => {
+            if (this._filmModal !== null) {
+              this._filmModal.onAddCommentError();
+            }
+          });
         break;
       case UserAction.DELETE_COMMENT:
         this._restService.deleteComment(update.commentId)

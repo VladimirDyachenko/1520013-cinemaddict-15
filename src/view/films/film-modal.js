@@ -252,7 +252,23 @@ export default class FilmModal extends SmartView {
     const movieId = this._data.id;
     const selectedEmoji = emojiInput.value;
 
+    this._setNewCommentFormEnabled(false);
     this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
+  }
+
+  onAddCommentError() {
+    const newCommentElement = this.getElement().querySelector('.film-details__new-comment');
+    newCommentElement.classList.add('shake');
+
+    setTimeout(() => {
+      newCommentElement.classList.remove('shake');
+      this._setNewCommentFormEnabled(true);
+    }, 600);
+  }
+
+  _setNewCommentFormEnabled(isEnabled) {
+    const inputsToDisable = this.getElement().querySelectorAll('.film-details__emoji-item, .film-details__comment-input');
+    [...inputsToDisable].forEach((element) => element.disabled = !isEnabled);
   }
 
   _deleteCommentHandler(event) {
