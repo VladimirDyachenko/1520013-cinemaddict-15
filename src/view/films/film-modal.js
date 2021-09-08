@@ -257,11 +257,25 @@ export default class FilmModal extends SmartView {
 
   _deleteCommentHandler(event) {
     event.preventDefault();
+    event.target.disabled = true;
+    event.target.textContent = 'Deleting...';
 
     const commentId = event.target.dataset.id;
     const movieId = this._data.id;
 
     this._callbacks.deleteComment(UserAction.DELETE_COMMENT, { movieId,  commentId});
+  }
+
+  onDeleteCommentError(commentId) {
+    const commentElement = this.getElement().querySelector(`li[data-comment-id="${commentId}"]`);
+    const deleteButton = commentElement.querySelector('.film-details__comment-delete');
+    commentElement.classList.add('shake');
+
+    setTimeout(() => {
+      deleteButton.disabled = false;
+      deleteButton.textContent = 'Delete';
+      commentElement.classList.remove('shake');
+    }, 600);
   }
 
   setControlClickHandler(callback) {

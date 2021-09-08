@@ -296,7 +296,12 @@ export default class FilmList {
         break;
       case UserAction.DELETE_COMMENT:
         this._restService.deleteComment(update.commentId)
-          .then(() => this._moviesModel.deleteComment(UpdateType.PATCH, update));
+          .then(() => this._moviesModel.deleteComment(UpdateType.PATCH, update))
+          .catch(() => {
+            if (this._filmModal !== null) {
+              this._filmModal.onDeleteCommentError(update.commentId);
+            }
+          });
         break;
       default:
         throw new Error(`Unhandled view action ${userAction}`);
