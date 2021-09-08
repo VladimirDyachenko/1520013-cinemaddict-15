@@ -193,6 +193,10 @@ export default class FilmModal extends SmartView {
     this._data = FilmModal.parseFilmToData(film);
   }
 
+  setComments(comments) {
+    this._comments = comments;
+  }
+
   onInit() {
     document.body.classList.add('hide-overflow');
     this._setInnerHandlers();

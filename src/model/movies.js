@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import AbstractSubscriber from './abstract-observer.js';
 
 export default class MoviesModel extends AbstractSubscriber {
@@ -70,15 +69,10 @@ export default class MoviesModel extends AbstractSubscriber {
     return {...this._filtredMovies };
   }
 
-  addComment(updateType, newComment) {
-    const show = this._movies.find((movie) => movie.id === newComment.movieId);
+  addComment(updateType, newMovie) {
+    const show = this._movies.find((movie) => movie.id === newMovie.id);
 
-    show.comments.push({
-      emote: newComment.selectedEmoji,
-      text: newComment.commentText,
-      date: dayjs().toString(),
-      author: 'Jon Doe',
-    });
+    show.comments = newMovie.comments;
 
     this.updateMovie(updateType, show);
   }
@@ -167,6 +161,14 @@ export default class MoviesModel extends AbstractSubscriber {
 
     delete adaptedComment['emotion'];
     delete adaptedComment['comment'];
+
+    return adaptedComment;
+  }
+
+  static adaptCommentToServer(comment) {
+    const adaptedComment = {};
+    adaptedComment['comment'] = comment.commentText;
+    adaptedComment['emotion'] = comment.selectedEmoji;
 
     return adaptedComment;
   }
