@@ -193,6 +193,10 @@ export default class FilmModal extends SmartView {
     this._data = FilmModal.parseFilmToData(film);
   }
 
+  setComments(comments) {
+    this._comments = comments;
+  }
+
   onInit() {
     document.body.classList.add('hide-overflow');
     this._setInnerHandlers();
@@ -248,16 +252,46 @@ export default class FilmModal extends SmartView {
     const movieId = this._data.id;
     const selectedEmoji = emojiInput.value;
 
+    this._setNewCommentFormEnabled(false);
     this._callbacks.addComment(UserAction.ADD_COMMENT, { movieId, commentText, selectedEmoji});
+  }
+
+  onAddCommentError() {
+    const newCommentElement = this.getElement().querySelector('.film-details__new-comment');
+    newCommentElement.classList.add('shake');
+
+    setTimeout(() => {
+      newCommentElement.classList.remove('shake');
+      this._setNewCommentFormEnabled(true);
+    }, 600);
+  }
+
+  _setNewCommentFormEnabled(isEnabled) {
+    const inputsToDisable = this.getElement().querySelectorAll('.film-details__emoji-item, .film-details__comment-input');
+    [...inputsToDisable].forEach((element) => element.disabled = !isEnabled);
   }
 
   _deleteCommentHandler(event) {
     event.preventDefault();
+    event.target.disabled = true;
+    event.target.textContent = 'Deleting...';
 
     const commentId = event.target.dataset.id;
     const movieId = this._data.id;
 
     this._callbacks.deleteComment(UserAction.DELETE_COMMENT, { movieId,  commentId});
+  }
+
+  onDeleteCommentError(commentId) {
+    const commentElement = this.getElement().querySelector(`li[data-comment-id="${commentId}"]`);
+    const deleteButton = commentElement.querySelector('.film-details__comment-delete');
+    commentElement.classList.add('shake');
+
+    setTimeout(() => {
+      deleteButton.disabled = false;
+      deleteButton.textContent = 'Delete';
+      commentElement.classList.remove('shake');
+    }, 600);
   }
 
   setControlClickHandler(callback) {

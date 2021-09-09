@@ -187,10 +187,10 @@ export default class FilmList {
     if (this._filmModal !== null) {
       //Обновляем так чтобы при открытии нового модального окна
       //сбросить состояние формы комментария
-      // this._filmModal.filmData = filmData;
-      // this._filmModal.updateData({}, true);
-      this._filmModal.destroyElement();
-      this._filmModal = null;
+      this._filmModal.filmData = filmData;
+      this._filmModal.setComments(comments);
+      this._filmModal.updateData({}, true);
+      return;
     }
 
     this._filmModal = new FilmModalView(filmData, comments);
@@ -213,8 +213,7 @@ export default class FilmList {
 
   _updateFilmModal(filmData) {
     if (this._filmModal !== null && this._filmModal.filmData.id === filmData.id) {
-      this._filmModal.filmData = filmData;
-      this._filmModal.updateElement();
+      this._openFilmModal(filmData);
     }
   }
 
@@ -292,10 +291,22 @@ export default class FilmList {
         this._filmControlClickHandler(update);
         break;
       case UserAction.ADD_COMMENT:
-        this._moviesModel.addComment(UpdateType.PATCH, update);
+        this._restService.addComment(update)
+          .then((movie) => this._moviesModel.addComment(UpdateType.PATCH, movie))
+          .catch(() => {
+            if (this._filmModal !== null) {
+              this._filmModal.onAddCommentError();
+            }
+          });
         break;
       case UserAction.DELETE_COMMENT:
-        this._moviesModel.deleteComment(UpdateType.PATCH, update);
+        this._restService.deleteComment(update.commentId)
+          .then(() => this._moviesModel.deleteComment(UpdateType.PATCH, update))
+          .catch(() => {
+            if (this._filmModal !== null) {
+              this._filmModal.onDeleteCommentError(update.commentId);
+            }
+          });
         break;
       default:
         throw new Error(`Unhandled view action ${userAction}`);

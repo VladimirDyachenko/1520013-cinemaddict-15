@@ -42,6 +42,24 @@ export default class RestService {
       .then(MoviesModel.adaptToClient);
   }
 
+  addComment(comment) {
+    return this._load({
+      url: `comments/${comment.movieId}`,
+      method: Method.POST,
+      body: JSON.stringify(MoviesModel.adaptCommentToServer(comment)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(RestService.toJSON)
+      .then((res) => MoviesModel.adaptToClient(res.movie));
+  }
+
+  deleteComment(commentID) {
+    return this._load({
+      url: `comments/${commentID}`,
+      method:Method.DELETE,
+    });
+  }
+
   _load({
     url,
     method = Method.GET,

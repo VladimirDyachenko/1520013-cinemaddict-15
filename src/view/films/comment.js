@@ -6,7 +6,7 @@ dayjs.extend(relativeTimePlugin);
 const getCommentTemplate = (comment) => {
   const dateString = dayjs().to(dayjs(comment.date));
 
-  return `<li class="film-details__comment">
+  return `<li class="film-details__comment" data-comment-id="${comment.id}">
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${comment.emote}.png" width="55" height="55" alt="emoji-smile">
     </span>
