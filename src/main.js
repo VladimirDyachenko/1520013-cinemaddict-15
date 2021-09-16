@@ -37,3 +37,5 @@ siteNavModel.setActivePage(UpdateType.MAJOR, Pages.All);
 restService.getMovies()
   .then((movies) => moviesModel.setMovies(UpdateType.INIT, movies))
   .catch(() => moviesModel.setMovies(UpdateType.INIT, []));
+
+window.addEventListener('load', () => window.navigator.serviceWorker.register('/sw.js'));
