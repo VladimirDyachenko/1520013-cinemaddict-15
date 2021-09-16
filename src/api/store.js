@@ -13,7 +13,7 @@ export class Store {
   }
 
   setItems(items) {
-    this._storage.setItems(this._storeKey, JSON.stringify(items));
+    this._storage.setItem(this._storeKey, JSON.stringify(items));
   }
 
   setItem(key, value) {

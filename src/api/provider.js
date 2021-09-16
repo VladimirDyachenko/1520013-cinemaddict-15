@@ -1,26 +1,88 @@
+import MoviesModel from '../model/movies.js';
+import { isOnline } from '../utils/utils.js';
+
+const createStoreStructure = (items) =>
+  items
+    .reduce((acc, current) => Object.assign({}, acc, {
+      [current.id]: current,
+    }), {});
+
+
 export class Provider {
   constructor(api, storage) {
     this._api = api;
     this._storage = storage;
+    this._isNeedSync = false;
   }
 
   getMovies() {
-    return this._api.getMovies();
+    if (isOnline()) {
+      return this._api.getMovies()
+        .then((movies) => {
+          const items = createStoreStructure(movies.map(MoviesModel.adaptToServer));
+          this._storage.setItems(items);
+          return movies;
+        });
+    }
+
+    const storeMovies = Object.values(this._storage.getItems());
+    return Promise.resolve(storeMovies.map(MoviesModel.adaptToClient));
   }
 
-  getCommentsForMovie() {
-    return this._api.getCommentsForMovie();
+  getCommentsForMovie(movieId) {
+    if (isOnline()) {
+      return this._api.getCommentsForMovie(movieId);
+    }
+
+    return Promise.reject(new Error('Get comments failed'));
   }
 
-  updateMovie() {
-    return this._api.updateMovie();
+  updateMovie(movie) {
+    if (isOnline()) {
+      return this._api.updateMovie(movie)
+        .then((updatedMovie) => {
+          this._storage.setItems(updatedMovie.id, MoviesModel.adaptToServer(updatedMovie));
+          return updatedMovie;
+        });
+    }
+
+    this._isNeedSync = true;
+    this._storage.setItem(movie.id, MoviesModel.adaptToServer(movie));
+    return Promise.resolve(movie);
   }
 
-  addComment() {
-    return this._api.addComment();
+  addComment(comment) {
+    if (isOnline()) {
+      return this._api.addComment(comment);
+    }
+
+    return Promise.reject(new Error('Add comment failed'));
   }
 
-  deleteComment() {
-    return this._api.deleteComment();
+  deleteComment(commentID) {
+    if (isOnline()) {
+      return this._api.deleteComment(commentID);
+    }
+
+    return Promise.reject(new Error('Delete comment failed'));
+  }
+
+  getIsNeedSync() {
+    return this._isNeedSync;
+  }
+
+  sync() {
+
+    if (isOnline()) {
+      const storeMovies = Object.values(this._storage.getItems());
+
+      return this._api.sync(storeMovies)
+        .then((response) => {
+          const items = createStoreStructure([...response.updated]);
+          this._storage.setItems(items);
+        });
+    }
+
+    return Promise.reject(new Error('Sync data failed'));
   }
 }

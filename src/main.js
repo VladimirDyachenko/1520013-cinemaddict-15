@@ -4,13 +4,13 @@ import SharedPresentor from './presenter/shared.js';
 import MoviesModel from './model/movies.js';
 import { getRandomPositiveInteger } from './utils/test-data.js';
 import SiteNavModel from './model/site-nav.js';
-import { END_POINT, AUTHORIZATION, Pages, UpdateType } from './const.js';
+import { END_POINT, AUTHORIZATION, Pages, UpdateType, LOCAL_STORE_KEY } from './const.js';
 import RestService from './api/rest-service.js';
 import { Provider } from './api/provider.js';
 import { Store } from './api/store.js';
 
 const restService = new RestService(END_POINT, AUTHORIZATION);
-const store = new Store('cinemaddict', localStorage);
+const store = new Store(LOCAL_STORE_KEY, localStorage);
 const apiProvider = new Provider(restService, store);
 
 const mainElement = document.querySelector('.main');
@@ -43,3 +43,14 @@ apiProvider.getMovies()
   .catch(() => moviesModel.setMovies(UpdateType.INIT, []));
 
 window.addEventListener('load', () => window.navigator.serviceWorker.register('/sw.js'));
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  if (apiProvider.getIsNeedSync()) {
+    apiProvider.sync();
+  }
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
+});

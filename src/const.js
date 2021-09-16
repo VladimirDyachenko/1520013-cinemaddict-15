@@ -59,3 +59,5 @@ export const TimeDelta = {
   MONTH: 'month',
   YEAR: 'year',
 };
+
+export const LOCAL_STORE_KEY = 'cinemaddict';

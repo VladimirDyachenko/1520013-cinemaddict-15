@@ -49,3 +49,29 @@ export const isDateInTimeGap = (date, gap, unit) => {
 
   return dayjs(date).isBetween(beforeDate, today, null, '[]');
 };
+
+// У меня всегда возвращается true, скорее всего из-за установленного vmware софта.
+// Да, даже, если в network поставить offline.
+// Поэтому пришлось эмитировать оффлайн вот таким способом.
+export const isOnline = () => window.navigator.onLine;
+
+// export const isOnline = async () => {
+//   if (!window.navigator.onLine) { return false; }
+
+//   // avoid CORS errors with a request to your own origin
+//   const url = new URL(window.location.origin);
+
+//   // unique value to prevent cached responses
+//   url.searchParams.set('date', new Date().toISOString);
+
+//   try {
+//     const response = await fetch(
+//       url.toString(),
+//       { method: 'HEAD' },
+//     );
+
+//     return response.ok;
+//   } catch (error) {
+//     return false;
+//   }
+// };
