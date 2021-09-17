@@ -1132,3 +1132,23 @@ button {
 .shake {
   animation: shake 0.6s;
 }
+
+.toast-container {
+  position: fixed;
+  top: 0.5rem;
+  bottom: 0;
+  left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  z-index: 100;
+}
+
+.toast-item {
+  max-width: 25ch;
+  background-color: #42141e;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 5px 3px 15px #000000b3;
+}
