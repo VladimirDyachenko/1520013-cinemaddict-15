@@ -239,7 +239,7 @@ export default class FilmList {
 
     this._topCommentedView.removeFilmCards();
     if (topCommented.length > 0) {
-      topRated.forEach((film) => this._renderExtraFilmCard(film, this._topCommentedView));
+      topCommented.forEach((film) => this._renderExtraFilmCard(film, this._topCommentedView));
       this._topCommentedView.show();
     } else {
       this._topCommentedView.hide();
