@@ -5,18 +5,19 @@ import { InsertPosition, renderElement } from '../utils/dom.js';
 import { UpdateType } from '../const.js';
 
 export default class Shared {
-  constructor(siteNavParent, totalFilms, moviesModel, siteNavModel) {
+  constructor(siteNavParent, moviesModel, siteNavModel) {
     this._siteNavParent = siteNavParent;
     this._moviesModel = moviesModel;
     this._siteNavModel = siteNavModel;
     this._headerElement = document.querySelector('.header');
     this._footerElement = document.querySelector('.footer');
-    this._totalFilms = totalFilms;
     this._filmsWatched = this._moviesModel.getFiltredMovies().historyList.length;
 
     const activePage = this._siteNavModel.getActivePage();
     const filterData = this._moviesModel.getFiltredMovies();
     this._siteMenuView = new SiteMenuView({activePage, filterData});
+    this._footerStatisticView = new FooterStatisticView(0);
+    this._userProfileView = new UserProfileView(0);
 
     this._handleMovieModelUpdate = this._handleMovieModelUpdate.bind(this);
     this._handleSiteNavModelUpdate = this._handleSiteNavModelUpdate.bind(this);
@@ -24,9 +25,9 @@ export default class Shared {
   }
 
   init() {
-    renderElement(this._headerElement, new UserProfileView(this._filmsWatched), InsertPosition.BEFORE_END);
+    renderElement(this._headerElement, this._userProfileView, InsertPosition.BEFORE_END);
     renderElement(this._siteNavParent, this._siteMenuView, InsertPosition.AFTER_BEGIN);
-    renderElement(this._footerElement, new FooterStatisticView(this._totalFilms), InsertPosition.BEFORE_END);
+    renderElement(this._footerElement, this._footerStatisticView, InsertPosition.BEFORE_END);
 
     this._moviesModel.subscribe(this._handleMovieModelUpdate);
     this._siteNavModel.subscribe(this._handleSiteNavModelUpdate);
@@ -36,7 +37,9 @@ export default class Shared {
   _handleMovieModelUpdate() {
     const activePage = this._siteNavModel.getActivePage();
     const filterData = this._moviesModel.getFiltredMovies();
+    const watchedCount = this._moviesModel.getFiltredMovies().historyList.length;
     this._siteMenuView.updateData({ activePage, filterData }, true);
+    this._userProfileView.updateData( { watched: watchedCount }, true);
   }
 
   _handleSiteNavModelUpdate() {
@@ -47,5 +50,9 @@ export default class Shared {
 
   _handleSiteNavAction(newPage){
     this._siteNavModel.setActivePage(UpdateType.MAJOR, newPage);
+  }
+
+  updateMoviesCount(count) {
+    this._footerStatisticView.updateCount(count);
   }
 }

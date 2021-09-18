@@ -1,5 +1,5 @@
 import { getUserRank } from '../utils/utils.js';
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
 const getUserProfileTemplate = (watchedFilmsAmount) => {
   const profileRating = getUserRank(watchedFilmsAmount);
@@ -10,13 +10,15 @@ const getUserProfileTemplate = (watchedFilmsAmount) => {
   </section>`;
 };
 
-export default class UserProfile extends AbstractView {
+export default class UserProfile extends SmartView {
   constructor(watchedFilmsAmount) {
     super();
-    this._watchedFilmsAmount = watchedFilmsAmount;
+    this._data = { watched: watchedFilmsAmount };
   }
 
   getTemplate() {
-    return getUserProfileTemplate(this._watchedFilmsAmount);
+    return getUserProfileTemplate(this._data.watched);
   }
+
+  restoreHandlers() { }
 }
