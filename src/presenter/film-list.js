@@ -4,10 +4,11 @@ import FilmCardView from '../view/films/film-card.js';
 import ShowMoreButtonView from '../view/films/show-more-button.js';
 import FilmListExtraView from '../view/films/films-list-extra.js';
 import FilmModalView from '../view/films/film-modal.js';
-import { renderElement, InsertPosition } from '../utils/dom.js';
+import { renderElement, InsertPosition, toast } from '../utils/dom.js';
 import { FilmControlAction, FILMS_PER_ROW, Pages, UserAction } from '../const.js';
 import { sortByRating, sortByReleaseDate } from '../utils/film-list.js';
 import { sortType, UpdateType } from '../const.js';
+import { isOnline } from '../utils/utils.js';
 
 export default class FilmList {
   constructor(listContainer, moviesModel, siteNavModel, restService) {
@@ -281,10 +282,6 @@ export default class FilmList {
     this._renderShowMore();
   }
 
-  /**
-   * @param {UserAction} userAction
-   * @param {{}} update
-   */
   _handleViewAction(userAction, update) {
     switch (userAction) {
       case UserAction.UPDATE_FILM:
@@ -297,6 +294,9 @@ export default class FilmList {
             if (this._filmModal !== null) {
               this._filmModal.onAddCommentError();
             }
+            if (!isOnline()) {
+              toast('Can\'t add comment offline');
+            }
           });
         break;
       case UserAction.DELETE_COMMENT:
@@ -305,6 +305,10 @@ export default class FilmList {
           .catch(() => {
             if (this._filmModal !== null) {
               this._filmModal.onDeleteCommentError(update.commentId);
+            }
+
+            if (!isOnline()) {
+              toast('Can\'t delete comment offline');
             }
           });
         break;
