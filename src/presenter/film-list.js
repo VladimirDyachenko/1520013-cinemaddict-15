@@ -24,6 +24,8 @@ export default class FilmList {
     this._showMoreButton = new ShowMoreButtonView();
     this._filmModal = null;
     this._restService = restService;
+    this._topRatedView = new FilmListExtraView('Top rated');
+    this._topCommentedView = new FilmListExtraView('Most commented');
 
     //Other
     this._renderedFilmCardsCount = FILMS_PER_ROW;
@@ -139,8 +141,10 @@ export default class FilmList {
   }
 
   _renderFilmListExtra() {
-    renderElement(this._filmList.getElement(), new FilmListExtraView(), InsertPosition.BEFORE_END);
-    renderElement(this._filmList.getElement(), new FilmListExtraView(), InsertPosition.BEFORE_END);
+    renderElement(this._filmList.getElement(), this._topRatedView, InsertPosition.BEFORE_END);
+    this._topRatedView.hide();
+    renderElement(this._filmList.getElement(), this._topCommentedView, InsertPosition.BEFORE_END);
+    this._topCommentedView.hide();
   }
 
   _renderFilmModal() {
@@ -182,7 +186,10 @@ export default class FilmList {
       comments = await this._restService.getCommentsForMovie(filmData.id);
     } catch (error) {
       comments = [];
-      //TODO отрисовать плашку, что комментарии не удалось загрузить
+
+      if (!isOnline()) {
+        toast('Can\'t load comment offline');
+      }
     }
 
     if (this._filmModal !== null) {
@@ -216,6 +223,34 @@ export default class FilmList {
     if (this._filmModal !== null && this._filmModal.filmData.id === filmData.id) {
       this._openFilmModal(filmData);
     }
+  }
+
+  _updateFilmListsExtra() {
+    const topRated = this._moviesModel.getTopRated();
+    const topCommented = this._moviesModel.getTopCommented();
+
+    this._topRatedView.removeFilmCards();
+    if (topRated.length > 0) {
+      topRated.forEach((film) => this._renderExtraFilmCard(film, this._topRatedView));
+      this._topRatedView.show();
+    } else {
+      this._topRatedView.hide();
+    }
+
+    this._topCommentedView.removeFilmCards();
+    if (topCommented.length > 0) {
+      topRated.forEach((film) => this._renderExtraFilmCard(film, this._topCommentedView));
+      this._topCommentedView.show();
+    } else {
+      this._topCommentedView.hide();
+    }
+  }
+
+  _renderExtraFilmCard(filmData, containerView) {
+    const filmCard = new FilmCardView(filmData, this._handleViewAction);
+    filmCard.setOpenModalHandler(() => this._openFilmModal(filmCard.film));
+    filmCard.setControlClickHandler(this._handleViewAction);
+    renderElement(containerView.getFilmContainer(), filmCard, InsertPosition.BEFORE_END);
   }
 
   _closeFilmModal() {
@@ -340,6 +375,7 @@ export default class FilmList {
         throw new Error(`Unhandled updateType ${updateType}`);
     }
     this._updateFilmModal(data);
+    this._updateFilmListsExtra();
   }
 
   destroy() {
