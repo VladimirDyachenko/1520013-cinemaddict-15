@@ -13,9 +13,10 @@ import { isOnline } from '../utils/utils.js';
 export default class FilmList {
   constructor(listContainer, moviesModel, siteNavModel, restService) {
     //Initial
+    this._listContainer = listContainer;
     this._moviesModel = moviesModel;
     this._siteNavModel = siteNavModel;
-    this._listContainer = listContainer;
+    this._restService = restService;
     this._isLoading = true;
 
     //Views
@@ -23,7 +24,6 @@ export default class FilmList {
     this._filmList = new FilmListView();
     this._showMoreButton = new ShowMoreButtonView();
     this._filmModal = null;
-    this._restService = restService;
     this._topRatedView = new FilmListExtraView('Top rated');
     this._topCommentedView = new FilmListExtraView('Most commented');
 
@@ -68,7 +68,7 @@ export default class FilmList {
         films = [...this._moviesModel.getFiltredMovies().watchList];
         break;
       default:
-        throw new Error('Missing page');
+        throw new Error(`Missing page ${activePage}`);
     }
 
     return films;
@@ -79,17 +79,29 @@ export default class FilmList {
       return;
     }
 
-    this._renderSort();
-    this._renderFilmList();
-
     if (this._filmData.length > 0) {
-      this._renderFilmCards(this._filmData.slice(0, Math.min(this._filmData.length, this._renderedFilmCardsCount)));
-      this._renderShowMore();
-    } else {
-      this._renderNoFilms();
+      this._renderSort();
     }
 
+    this._renderFilmList();
     this._renderFilmListExtra();
+    if (this._filmData.length === 0) {
+      this._filmList.showEmptyMessage(this._siteNavModel.getActivePage(), this._isLoading);
+      return;
+    }
+
+    //Эта проверка обеспечивает нормальный рендер карточки
+    //если она была добавлена в одну из категорий из экстра блоков
+    if (
+      this._filmData.length > this._renderedFilmCardsCount
+      && this._renderedFilmCardsCount % FILMS_PER_ROW !== 0
+    ) {
+      this._renderedFilmCardsCount++;
+    }
+    const filmsToRender = this._filmData.slice(0, Math.min(this._filmData.length, this._renderedFilmCardsCount));
+
+    this._renderFilmCards(filmsToRender);
+    this._renderShowMore();
   }
 
   _renderSort() {
@@ -113,10 +125,6 @@ export default class FilmList {
     films.forEach((film) => this._renderFilmCard(film));
   }
 
-  _renderNoFilms() {
-    this._filmList.showEmptyMessage(this._siteNavModel.getActivePage(), this._isLoading);
-  }
-
   _clearFilmList(resetRenderedCardsCount) {
     this._renderedCards.forEach((cardView) => cardView.destroyElement());
     this._renderedCards.clear();
@@ -136,6 +144,7 @@ export default class FilmList {
     if (this._showMoreButton === null) {
       this._showMoreButton = new ShowMoreButtonView();
     }
+
     renderElement(this._filmList.getFilmSection(), this._showMoreButton, InsertPosition.BEFORE_END);
     this._showMoreButton.setClickHandler(this._showMoreClickHandler);
   }
