@@ -7,6 +7,7 @@ import { END_POINT, AUTHORIZATION, Pages, UpdateType, LOCAL_STORE_KEY } from './
 import RestService from './api/rest-service.js';
 import { Provider } from './api/provider.js';
 import { Store } from './api/store.js';
+import { isOnline } from './utils/utils.js';
 
 const restService = new RestService(END_POINT, AUTHORIZATION);
 const store = new Store(LOCAL_STORE_KEY, localStorage);
@@ -43,15 +44,24 @@ apiProvider.getMovies()
   })
   .catch(() => moviesModel.setMovies(UpdateType.INIT, []));
 
-window.addEventListener('load', () => window.navigator.serviceWorker.register('/sw.js'));
+const updateTitle = () => {
+  if (isOnline()) {
+    document.title = document.title.replace(' [offline]', '');
+  } else {
+    document.title += ' [offline]';
+  }
+};
+
+window.addEventListener('load', () => {
+  window.navigator.serviceWorker.register('./sw.js');
+  updateTitle();
+});
 
 window.addEventListener('online', () => {
-  document.title = document.title.replace(' [offline]', '');
+  updateTitle();
   if (apiProvider.getIsNeedSync()) {
     apiProvider.sync();
   }
 });
 
-window.addEventListener('offline', () => {
-  document.title += ' [offline]';
-});
+window.addEventListener('offline', () => updateTitle());
