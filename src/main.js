@@ -3,7 +3,7 @@ import FilmListPresenter from './presenter/film-list.js';
 import SharedPresentor from './presenter/shared.js';
 import MoviesModel from './model/movies.js';
 import SiteNavModel from './model/site-nav.js';
-import { END_POINT, AUTHORIZATION, Pages, UpdateType, LOCAL_STORE_KEY } from './const.js';
+import { END_POINT, AUTHORIZATION, Pages, UpdateType, LOCAL_STORE_KEY, OFFLINE_PREFIX } from './const.js';
 import RestService from './api/rest-service.js';
 import { Provider } from './api/provider.js';
 import { Store } from './api/store.js';
@@ -45,11 +45,7 @@ apiProvider.getMovies()
   .catch(() => moviesModel.setMovies(UpdateType.INIT, []));
 
 const updateTitle = () => {
-  if (isOnline()) {
-    document.title = document.title.replace(' [offline]', '');
-  } else {
-    document.title += ' [offline]';
-  }
+  isOnline() ? document.title = document.title.replace(`${OFFLINE_PREFIX}`, '') : document.title += OFFLINE_PREFIX;
 };
 
 window.addEventListener('load', () => {
