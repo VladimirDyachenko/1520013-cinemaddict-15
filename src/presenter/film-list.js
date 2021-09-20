@@ -311,7 +311,7 @@ export default class FilmList {
         throw new Error(`Unhandled sort type ${selectedSort}`);
     }
 
-    this._clearFilmList();
+    this._clearFilmList({ resetRenderedCardsCount: true });
     this._renderFilmCards(this._filmData.slice(0, this._renderedFilmCardsCount));
     this._showMoreButton = new ShowMoreButtonView();
     this._renderShowMore();
