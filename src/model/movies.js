@@ -9,6 +9,8 @@ export default class MoviesModel extends AbstractSubscriber {
       historyList: [],
       favoriteList: [],
     };
+    this._topCommented = [];
+    this._topRated = [];
   }
 
   set movies(movies) {
@@ -37,6 +39,8 @@ export default class MoviesModel extends AbstractSubscriber {
       historyList,
       favoriteList,
     };
+
+    this._computeTop();
   }
 
   setMovies(updateType, movies) {
@@ -47,6 +51,50 @@ export default class MoviesModel extends AbstractSubscriber {
 
   get movies() {
     return [...this._movies];
+  }
+
+  getTopCommented() {
+    return [...this._topCommented];
+  }
+
+  getTopRated() {
+    return [...this._topRated];
+  }
+
+  _computeTop() {
+    const moviesWithComments = [];
+    const moviesWithRating = [];
+
+    this._movies.forEach((movie) => {
+      if (movie.comments.length !== 0) {
+        moviesWithComments.push(movie);
+      }
+
+      if (movie.totalRating !== 0) {
+        moviesWithRating.push(movie);
+      }
+    });
+
+    moviesWithComments.sort((a, b) => b.comments.length - a.comments.length);
+    moviesWithRating.sort((a, b) => b.totalRating - a.totalRating);
+
+    this._topCommented = this._getTopElements(moviesWithComments, 'comments', 2);
+    this._topRated = this._getTopElements(moviesWithRating, 'totalRating', 2);
+  }
+
+  _getTopElements(array, key, amount) {
+    const copy = [...array];
+
+    if (copy.length <= amount) {
+      return copy;
+    }
+
+    //if all items equal we should get random elements from array
+    if (copy[0][key] === copy[copy.length - 1][key]) {
+      return copy.sort(() => Math.random() - 0.5).slice(0, amount);
+    }
+
+    return copy.slice(0, amount);
   }
 
   updateMovie(updateType, newMovie) {

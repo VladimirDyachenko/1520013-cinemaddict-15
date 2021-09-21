@@ -61,3 +61,5 @@ export const TimeDelta = {
 };
 
 export const LOCAL_STORE_KEY = 'cinemaddict';
+
+export const OFFLINE_PREFIX = ' [offline]';

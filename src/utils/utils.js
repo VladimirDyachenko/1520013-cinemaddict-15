@@ -12,6 +12,10 @@ export const getRuntimeString = (runtimeInMinutes) => {
 };
 
 export const getUserRank = (watchedFilmAmount) => {
+  if (!watchedFilmAmount || watchedFilmAmount === 0) {
+    return '';
+  }
+
   const tires = Object.entries(RankTrie);
   for(const tire of tires) {
     if (watchedFilmAmount <= tire[0]) {
