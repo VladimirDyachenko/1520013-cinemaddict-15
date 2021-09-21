@@ -11,10 +11,10 @@ export default class Shared {
     this._siteNavModel = siteNavModel;
     this._headerElement = document.querySelector('.header');
     this._footerElement = document.querySelector('.footer');
-    this._filmsWatched = this._moviesModel.getFiltredMovies().historyList.length;
+    this._filmsWatched = this._moviesModel.getFilteredMovies().historyList.length;
 
     const activePage = this._siteNavModel.getActivePage();
-    const filterData = this._moviesModel.getFiltredMovies();
+    const filterData = this._moviesModel.getFilteredMovies();
     this._siteMenuView = new SiteMenuView({activePage, filterData});
     this._footerStatisticView = new FooterStatisticView(0);
     this._userProfileView = new UserProfileView(0);
@@ -36,15 +36,15 @@ export default class Shared {
 
   _handleMovieModelUpdate() {
     const activePage = this._siteNavModel.getActivePage();
-    const filterData = this._moviesModel.getFiltredMovies();
-    const watchedCount = this._moviesModel.getFiltredMovies().historyList.length;
+    const filterData = this._moviesModel.getFilteredMovies();
+    const watchedCount = this._moviesModel.getFilteredMovies().historyList.length;
     this._siteMenuView.updateData({ activePage, filterData }, true);
     this._userProfileView.updateData( { watched: watchedCount }, true);
   }
 
   _handleSiteNavModelUpdate() {
     const activePage = this._siteNavModel.getActivePage();
-    const filterData = this._moviesModel.getFiltredMovies();
+    const filterData = this._moviesModel.getFilteredMovies();
     this._siteMenuView.updateData({ activePage, filterData }, true);
   }
 
