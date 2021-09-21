@@ -59,13 +59,13 @@ export default class FilmList {
         films = this._moviesModel.movies;
         break;
       case Pages.FAVORITE:
-        films = [...this._moviesModel.getFiltredMovies().favoriteList];
+        films = [...this._moviesModel.getFilteredMovies().favoriteList];
         break;
       case Pages.HISTORY:
-        films = [...this._moviesModel.getFiltredMovies().historyList];
+        films = [...this._moviesModel.getFilteredMovies().historyList];
         break;
       case Pages.WATCHLIST:
-        films = [...this._moviesModel.getFiltredMovies().watchList];
+        films = [...this._moviesModel.getFilteredMovies().watchList];
         break;
       default:
         throw new Error(`Missing page ${activePage}`);

@@ -113,7 +113,7 @@ export default class MoviesModel extends AbstractSubscriber {
     this._notify(updateType, newMovie);
   }
 
-  getFiltredMovies() {
+  getFilteredMovies() {
     return {...this._filtredMovies };
   }
 
